@@ -1,6 +1,51 @@
 from embedders import SentenceTransformerEmbedder
 from store import ElasticSearchVectorStore
 from mitreattack.stix20 import MitreAttackData
+import requests
+import os
+
+def download_mitre_attack_data():
+    '''Descarga el archivo MITRE ATT&CK desde GitHub solo si hay una nueva versión disponible.'''
+    url = 'https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack.json'
+    download_dir = 'data'
+
+    etag_filepath = os.path.join(download_dir, 'enterprise-attack.json.etag')
+    stix_filepath = os.path.join(download_dir, 'enterprise-attack.json')
+
+    print("Verificando si hay una nueva versión del archivo MITRE ATT&CK...")
+    try:
+        req = requests.head(url)
+        if req.status_code == 200:
+            remote_etag = req.headers.get('ETag')
+            if os.path.exists(etag_filepath):
+                with open(etag_filepath, 'r') as f:
+                    local_etag = f.read().strip()
+                if local_etag == remote_etag:
+                    print("El archivo MITRE ATT&CK ya está actualizado. No se necesita descargar.")
+                    return stix_filepath
+                else:
+                    print("Hay una nueva versión del archivo MITRE ATT&CK. Descargando...")
+            else:
+                print("No se encontró un archivo ETag local. Descargando el archivo MITRE ATT&CK...")
+
+            response = requests.get(url)
+            if response.status_code == 200:
+                with open(stix_filepath, 'w') as f:
+                    f.write(response.text)
+                with open(etag_filepath, 'w') as f:
+                    f.write(remote_etag)
+                print("Archivo MITRE ATT&CK descargado y actualizado exitosamente.")
+                return stix_filepath
+            else:
+                print(f"Error al descargar el archivo: {response.status_code}")
+                return None
+        else:
+            print(f"Error al verificar el archivo: {req.status_code}")
+            return None
+        
+    except Exception as e:
+        print(f"Error al verificar o descargar el archivo MITRE ATT&CK: {e}")
+        return None
 
 print("Inicializando módulos...")
 embedder = SentenceTransformerEmbedder()
@@ -18,14 +63,11 @@ mitre_columns = {
 vector_store.initialize(dims=384, custom_columns=mitre_columns)
 
 print("Cargando datos de MITRE ATT&CK...")
-mitre_data = MitreAttackData('data/enterprise-attack.json')
-techniques = mitre_data.get_techniques()
+mitre_data = MitreAttackData(download_mitre_attack_data())
+techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtramos técnicas revocadas o deprecadas
 
 documents = []
 for t in techniques:
-    if getattr(t, 'description', None) is None or t.revoked or t.x_mitre_deprecated:
-        continue
-
     print(f"Procesando técnica: {t.name}")
     doc = {
         'id': t.id,
@@ -35,7 +77,6 @@ for t in techniques:
         'tactics': [phase.phase_name for phase in t.kill_chain_phases],
         'platforms': t.x_mitre_platforms,
         'is_subtechnique': t.x_mitre_is_subtechnique,
-        'detection': t.x_mitre_detection,
         'external_references': [dict(ref) for ref in t.external_references if ref],
         'vector': embedder.embed_query(t.description)
     }

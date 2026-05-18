@@ -4,7 +4,7 @@ def main():
 
 
     response = chat(
-        model='qwen2.5:0.5b',
+        model='llama3.1:8b',
         messages=[{'role': 'user', 'content': 'Cuál es la capital de Turquía?'}],
 )
     print(response.message.content)

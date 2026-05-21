@@ -1,74 +1,41 @@
-from typing import Annotated, TypedDict
-from langchain_ollama import ChatOllama
-from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
+from .nodes import classification_node, mitre_search_node, cve_search_node, final_report_node
+from ..models.models import AgentState
 from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode
 
-from src.agent.tools import query_mitre, query_cve
-
-class AgentState(TypedDict):
-    messages: Annotated[BaseMessage, add_messages]
-
-llm = ChatOllama(model='llama3.1:8b')
-
-available_tools = [query_cve, query_mitre]
-llm_with_tools = llm.bind_tools(available_tools)
-
-def agent_node(state: AgentState):
-    '''Agent node that processes messages and generates a response.'''
-    messages = state['messages']
-    instructions = SystemMessage(content='''
-                                 You are a SOC expert analyst. Your work is to analyze security alerts, logs and
-                                 threat intelligence to identify potential security incidents and recommend appropriate responses.
-                                 YOU HAVE TOOLS AVAILABLE TO YOU, USE THEM WHEN NECESSARY TO COMPLETE YOUR TASKS.
-                                 They allow you to query databases, CVE for vulnerabilities, and MITRE for attack techniques, among other things. 
-                                 Always use them when you need to retrieve information to complete your tasks.
-                                 Answer in a structured, professional and concise way.
-                                 ''')
-    if len(messages) == 1:
-        # If it's the first message, add the system instructions
-        messages = [instructions] + messages
-
-    response = llm_with_tools.invoke(messages)
-    return {'messages': [response]}
-
-
-def use_tool_decision(state: AgentState):
-    '''Decision node that determines whether the agent should use a tool or not.'''
-    last_message = state['messages'][-1]
-    
-    if hasattr(last_message, 'tool_calls') and len(last_message.tool_calls) > 0:
-        return 'action'
-    
-    return 'end'
 
 workflow = StateGraph(AgentState)
-workflow.add_node('agent', agent_node)
-workflow.add_node('action', ToolNode(available_tools))
-workflow.set_entry_point('agent')
-workflow.add_conditional_edges(
-    'agent',
-    use_tool_decision,
-    {
-        'action': 'action',
-        'end': END
-    }
-)
+workflow.add_node('classification', classification_node)
+workflow.add_node('mitre_search_node', mitre_search_node)
+workflow.add_node('cve_search_node', cve_search_node)
+workflow.add_node('final_report_node', final_report_node)
 
-workflow.add_edge('action', 'agent')
+workflow.set_entry_point('classification')
+
+workflow.add_edge('classification', 'mitre_search_node')
+workflow.add_edge('classification', 'cve_search_node')
+
+workflow.add_edge(['mitre_search_node', 'cve_search_node'], 'final_report_node')
+
+workflow.add_edge('classification', END)
+
 app = workflow.compile()
 
 if __name__ == "__main__":    
-    print('SOC Agent is ready to receive messages. Type "exit" or "quit" to stop the agent.')
-    while True:
-        user_input = input("\nUser: ")
-        if user_input.lower() in ['exit', 'quit']:
-            print("Exiting SOC Agent.")
-            break
+    user_input = 'EDR alert: Detected exploitation attempt on web server. '
 
-        inputs = {'messages': [HumanMessage(content=user_input)]}
-        for event in app.stream(inputs, stream_mode='values'):
-            last_message = event['messages'][-1]
-            if hasattr(last_message, 'content') and last_message.content and not hasattr(last_message, 'tool_calls'):
-                print(f"Agent: {last_message.content}")
+    inputs = {'original_alert': user_input}
+    for event in app.stream(inputs, stream_mode='updates'):
+        for node_name, node_state in event.items():
+            print(f'\nNODO: [{node_name}]')
+
+            if 'classification' in node_state:
+                print(f"Classification: {node_state['classification']}")
+
+            if 'mitre_data' in node_state:
+                print(f"MITRE Data: {node_state['mitre_data'][:200]}...")
+
+            if 'cve_data' in node_state:
+                print(f"CVE Data: {node_state['cve_data'][:200]}...")
+
+            if 'final_report' in node_state:
+                print(f"Final Report: {node_state['final_report']}")

@@ -1,0 +1,107 @@
+
+import os
+
+from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
+from src.retrieval.embedders import SentenceTransformerEmbedder
+from src.retrieval.store import ElasticSearchVectorStore
+
+from src.models.models import AlertClasification, AgentState
+
+from langchain_google_genai import ChatGoogleGenerativeAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv('GEMINI_TOKEN')
+llm = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2)
+
+embedder = SentenceTransformerEmbedder()
+cve_store = ElasticSearchVectorStore(index_name='cve_index')
+mitre_store = ElasticSearchVectorStore(index_name='mitre_attack')
+
+
+def classification_node(state: AgentState) -> AgentState:
+    '''Node that classifies the alert and extracts relevant keywords for MITRE and CVE searches.'''
+    prompt = f'''
+    You are a SOC analyst. Your task is to analyze the following security alert and determine if it contains information that can be used to search in MITRE and CVE databases.
+
+    Alert: {state['original_alert']}
+
+    For MITRE, you are looking for behaviors, commands, processes, tactics or malware mentioned in the alert. If you find any, set mitre_search to True and extract the relevant keywords for searching in MITRE database.
+
+    For CVE, you are looking for software versions, scan results or vulnerability identifiers mentioned in the alert. If you find any, set cve_search to True and extract the relevant keywords for searching in CVE database.
+    
+    EXAMPLES:
+    - Alert: "Multiple failed login attempts in RDP" mitre_search: True (brute force), cve_search: False (no vulnerabilities mentioned)
+    - Alert: "WINRAR old version detected that allows remote code execution" mitre_search: False, cve_search: True (WINRAR vulnerability)
+    - Alert: "Mimikatz process detected running in memory" mitre_search: True (credential dumping), cve_search: False (no vulnerabilities mentioned)
+    - Alert: "Proxyshell exploitation (CVE-2021-34473) followed by webshell detected" mitre_search: True (Web Shell), cve_search: True (Proxyshell vulnerability)
+    
+    At the slightest suspicion of malicious behavior, you MUST set mitre_search to True, and if there is any mention of exploitable software, vulnerabilities or patches, you MUST set cve_search to True.
+    '''
+    structured_llm = llm.with_structured_output(AlertClasification)
+    classification = structured_llm.invoke([SystemMessage(content=prompt),
+                                            HumanMessage(content=f'The alert to analyze is: {state["original_alert"]}')])
+    return {'classification': classification}
+
+
+def mitre_search_node(state: AgentState) -> AgentState:
+    '''Node that performs MITRE search if mitre_search is True.'''
+
+    if not state['classification'].mitre_search:
+        return {'mitre_data': 'No relevant MITRE information found in the alert.'}
+    
+    query = state['classification'].mitre_description
+    query_vector = embedder.embed_query(query)
+    results = mitre_store.search(query_vector, top_k=3)
+
+    results_text = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
+                    f"Name: {r['name']}\n"
+                    f"Description: {r['description']}\n"
+                    f"Tactics: {r['tactics']}\n"
+                    f"Platforms: {r['platforms']}\n"
+                    "-----------------" for r in results])
+    return {'mitre_data': results_text}
+
+def cve_search_node(state: AgentState) -> AgentState:
+    '''Node that performs CVE search if cve_search is True.'''
+
+    if not state['classification'].cve_search:
+        return {'cve_data': 'No relevant CVE information found in the alert.'}
+
+    query = state['classification'].cve_description
+    query_vector = embedder.embed_query(query)
+    results = cve_store.search(query_vector, top_k=3)
+
+    results_text = 'CVE results:\n' + '\n'.join([f"CVE ID: {r['id']}\n"
+                    f"Title: {r['title']}\n"
+                    f"Description: {r['description']}\n"
+                    f"Published Date: {r['published_date']}\n"
+                    f"CVSS: {r['cvss']}\n"
+                    f"Affected Products: {r['versions']}\n"
+                    f"Mitigations: {r['mitigations']}\n"
+                    f"SSVC: {r['ssvc']}\n"
+                    f"References: {r['references']}\n"
+                    f"In KEV: {r['in_kev']}\n"
+                    "-----------------" for r in results])
+    return {'cve_data': results_text}
+
+def final_report_node(state: AgentState) -> AgentState:
+    '''Node that generates a final report based on the original alert, the classification, and the retrieved MITRE and CVE information.'''
+    prompt = f'''
+    You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and CVE vulnerabilities that have been identified.
+    Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
+    '''
+
+    user_input = f'''
+    Original Alert: {state['original_alert']}
+    Classification: {state['classification']}
+    MITRE Information: {state['mitre_data']}
+    CVE Information: {state['cve_data']}'''
+
+    response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=user_input)])
+    # Escribir en un archivo de texto el informe final
+    with open('final_report.md', 'w') as f:
+        f.write(response.content[0]['text'])
+    
+    return {'final_report': response.content[0]}

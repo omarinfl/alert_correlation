@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
 from src.retrieval.embedders import SentenceTransformerEmbedder
 from src.retrieval.store import ElasticSearchVectorStore
 
-from src.models.models import AlertClasification, AgentState
+from src.models.models import AlertClasification, AgentState, ValidationReport
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
@@ -53,7 +53,7 @@ def mitre_search_node(state: AgentState) -> AgentState:
     
     query = state['classification'].mitre_description
     query_vector = embedder.embed_query(query)
-    results = mitre_store.search(query_vector, top_k=3)
+    results = mitre_store.search(query_vector, top_k=5)
 
     results_text = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
                     f"Name: {r['name']}\n"
@@ -86,18 +86,54 @@ def cve_search_node(state: AgentState) -> AgentState:
                     "-----------------" for r in results])
     return {'cve_data': results_text}
 
+def validation_node(state: AgentState) -> AgentState:
+    '''Node that validates the relevance of the retrieved MITRE and CVE information.'''
+    
+    prompt = f'''
+    You are a SOC analyst. Your task is to evaluate the relevance of the retrieved MITRE techniques and CVE vulnerabilities from an automatic search system.
+    You must evaluate if each result is actually relevant to the original alert or whether it is semantic noise (for example, a MITRE technique that shares some keywords with the alert but is not actually related to the attack described in the alert).
+    
+    ORIGINAL ALERT: {state['original_alert']}
+
+    EXTRACTED MITRE RESULTS: {state['mitre_data']}
+    
+    EXTRACTED CVE RESULTS: {state['cve_data']}
+
+    INSTRUCTIONS:
+    - Compare each technique and vulnerability with the original alert.
+    - For each MITRE technique retrieved, assign a relevance score from 0 to 1, where 0 means completely irrelevant and 1 means highly relevant. 
+    - Provide a detailed explanation of why you assigned that score.
+    - Make a final decision on whether this technique should be included in the final report or not (decision=True/False).
+    '''
+
+    validator = llm.with_structured_output(ValidationReport)
+    validation_report = validator.invoke([HumanMessage(content=prompt)])
+
+    for evaluation in validation_report.mitre_evaluations + validation_report.cve_evaluations:
+        print(f"ID {evaluation.item_id} - Relevance Score: {evaluation.relevance_score}, Decision: {evaluation.decision}\nExplanation: {evaluation.explanation}\n")
+    return {'validation_report': validation_report}
+
+
+
+
+
 def final_report_node(state: AgentState) -> AgentState:
     '''Node that generates a final report based on the original alert, the classification, and the retrieved MITRE and CVE information.'''
+    
+    validated_data = state['validation_report']
+    validated_mitre = [e for e in validated_data.mitre_evaluations if e.decision]
+    validated_cve = [e for e in validated_data.cve_evaluations if e.decision]
+    
     prompt = f'''
-    You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and CVE vulnerabilities that have been identified.
+    You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and its tactics and CVE vulnerabilities that have been identified.
     Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
     '''
 
     user_input = f'''
     Original Alert: {state['original_alert']}
     Classification: {state['classification']}
-    MITRE Information: {state['mitre_data']}
-    CVE Information: {state['cve_data']}'''
+    MITRE Information: {validated_mitre}
+    CVE Information: {validated_cve}'''
 
     response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=user_input)])
     # Escribir en un archivo de texto el informe final

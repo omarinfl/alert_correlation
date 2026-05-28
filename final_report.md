@@ -1,26 +1,31 @@
-# Incident Report: Web Application Reconnaissance Attempt
+# Incident Analysis Report: Unauthorized/Suspicious RDP Activity
 
 ## 1. Incident Summary
-*   **Timestamp:** 2022-01-18T12:28:56Z
-*   **Source IP:** 172.17.130.196
-*   **Target Agent:** wazuh-client (10.35.35.206)
-*   **Alert Description:** Web server 400 error code (Rule 31101)
-*   **Observed Activity:** The source IP performed a `GET` request for `/wp-includes/blocks/query/wsdl`. This path does not exist on the target, resulting in a 404 error. The request pattern is consistent with automated vulnerability scanning or an attempt to fingerprint the WordPress installation.
+*   **Alert:** User `user1` initiated a Remote Desktop Protocol (RDP) connection from source host `fleatbottom` to destination host `sept` using the `mstsc.exe` client.
+*   **Date/Time:** [Insert Timestamp]
+*   **Source Host:** `fleatbottom`
+*   **Destination Host:** `sept`
+*   **User Account:** `user1`
 
-## 2. Threat Intelligence Correlation
-*   **MITRE ATT&CK Tactics:**
-    *   **Reconnaissance (TA0043):** The activity is indicative of automated scanning to identify the presence of specific WordPress files or potential misconfigurations.
-    *   **Exploitation of Web Application (T1190):** The attacker is probing for known paths associated with WordPress vulnerabilities to determine if the target is susceptible to exploitation.
-*   **CVE Context:**
-    *   The request targets the `/wp-includes/` directory, a common target for attackers looking to exploit vulnerabilities in WordPress core files. While no specific CVE was triggered, this behavior is a precursor to exploiting known vulnerabilities related to WordPress file inclusion or information disclosure.
+## 2. MITRE ATT&CK Correlation
+The activity has been mapped to the following MITRE ATT&CK framework technique:
 
-## 3. Assessment
+*   **Technique ID:** [T1021.001](https://attack.mitre.org/techniques/T1021/001)
+*   **Technique Name:** Remote Desktop Protocol
+*   **Tactic:** Lateral Movement
+*   **Analysis:** The use of `mstsc.exe` to connect between internal hosts is a standard method for lateral movement. While RDP is a legitimate administrative tool, its use should be validated against expected operational baselines for `user1` and the involved hosts.
+
+## 3. CVE Vulnerability Assessment
+*   **Status:** No specific CVEs were identified or associated with this alert. The activity is categorized as a behavioral event rather than an exploit of a known software vulnerability.
+
+## 4. Assessment
 *   **Severity:** **Medium**
-*   **Priority:** **Low**
-*   **Justification:** The high frequency of the rule firing (185,909 times) suggests a widespread automated scan rather than a targeted, manual attack. While the request was unsuccessful (404), it confirms that the host is being actively probed by external actors.
+*   **Priority:** **Medium**
+*   **Rationale:** The activity represents a potential lateral movement vector. Without context regarding whether `user1` is authorized to access `sept` from `fleatbottom`, this must be treated as a security event requiring verification.
 
-## 4. Recommended Response Actions
-1.  **Block Source IP:** Implement a temporary block on the source IP `172.17.130.196` at the perimeter firewall or via `iptables` on the affected host to mitigate further scanning.
-2.  **Verify WordPress Integrity:** Ensure the WordPress installation is updated to the latest version and that all plugins/themes are patched to mitigate potential exploitation of core files.
-3.  **Review Access Logs:** Conduct a deeper analysis of `/var/log/apache2/intranet-access.log` to determine if the source IP attempted other malicious paths or successfully accessed any sensitive files.
-4.  **Monitor:** Continue monitoring for similar patterns from this IP or other external sources. If the scanning persists from multiple IPs, consider implementing a Web Application Firewall (WAF) rule to drop requests containing common exploit path patterns.
+## 5. Recommended Response Actions
+1.  **Verify Authorization:** Confirm with the system administrator or the owner of `user1` if this RDP session was a scheduled or authorized administrative task.
+2.  **Review Logs:** Examine logs on host `sept` for concurrent activity, such as command execution, file modifications, or privilege escalation attempts following the RDP login.
+3.  **Check Account Activity:** Investigate if `user1` has exhibited unusual behavior or if there have been multiple failed login attempts preceding this successful connection.
+4.  **Containment (If Unauthorized):** If the activity is deemed unauthorized, immediately terminate the RDP session, disable the `user1` account, and isolate host `fleatbottom` for forensic analysis.
+5.  **Policy Review:** Ensure that RDP access is restricted to authorized users and specific jump hosts via Group Policy or firewall rules to minimize the attack surface.

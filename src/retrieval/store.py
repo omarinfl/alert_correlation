@@ -54,6 +54,7 @@ class ElasticSearchVectorStore(VectorStore):
 
     def search(self, query_vector: list[float], top_k: int = 5, filter: dict = None) -> list[dict]:
         query = {
+            "size": top_k,
             "knn": {
                 "field": "vector",
                 "query_vector": query_vector,

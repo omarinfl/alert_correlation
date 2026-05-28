@@ -1,2 +1,3 @@
 alert, label
 "user1 connects to sept from fleatbottom through RDP via mstsc", "T1021.001"
+"CEF:0|Carbon Black v7.8.0|SIEM|1.0|100|ids_alert|critical| desc=Carbon Black Alert: Credential Stuffing detected from 54.159.34.148 targeting N/A No additional info"

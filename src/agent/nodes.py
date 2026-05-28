@@ -31,6 +31,8 @@ def classification_node(state: AgentState) -> AgentState:
 
     For CVE, you are looking for software versions, scan results or vulnerability identifiers mentioned in the alert. If you find any, set cve_search to True and extract the relevant keywords for searching in CVE database.
     
+    Also, create a technical description of the alert that can be used as a query for the searches in MITRE and CVE databases. DO NOT make assumptions, just explain the alert with details.
+    
     EXAMPLES:
     - Alert: "Multiple failed login attempts in RDP" mitre_search: True (brute force), cve_search: False (no vulnerabilities mentioned)
     - Alert: "WINRAR old version detected that allows remote code execution" mitre_search: False, cve_search: True (WINRAR vulnerability)

@@ -1,31 +1,39 @@
-# Incident Analysis Report: Unauthorized/Suspicious RDP Activity
+# Incident Report: Agent Flooding and Suspicious Process Enumeration
 
-## 1. Incident Summary
-*   **Alert:** User `user1` initiated a Remote Desktop Protocol (RDP) connection from source host `fleatbottom` to destination host `sept` using the `mstsc.exe` client.
-*   **Date/Time:** [Insert Timestamp]
-*   **Source Host:** `fleatbottom`
-*   **Destination Host:** `sept`
-*   **User Account:** `user1`
+**Date:** 2025-09-22  
+**Host:** `videoserver` (172.17.100.121)  
+**Status:** Active Investigation  
 
-## 2. MITRE ATT&CK Correlation
-The activity has been mapped to the following MITRE ATT&CK framework technique:
+---
 
-*   **Technique ID:** [T1021.001](https://attack.mitre.org/techniques/T1021/001)
-*   **Technique Name:** Remote Desktop Protocol
-*   **Tactic:** Lateral Movement
-*   **Analysis:** The use of `mstsc.exe` to connect between internal hosts is a standard method for lateral movement. While RDP is a legitimate administrative tool, its use should be validated against expected operational baselines for `user1` and the involved hosts.
+### 1. Incident Summary
+The Wazuh manager reported a recurring "Agent event queue is full" alert (Rule 203) on the host `videoserver`. This indicates that the agent is unable to process or transmit logs to the manager, effectively creating a blind spot in monitoring. Correlated logs show frequent execution of the `ps` command by the `www-data` user, suggesting that a web-based service or application on the server is likely being abused to perform process enumeration, which in turn is generating the excessive log volume that triggered the flooding.
 
-## 3. CVE Vulnerability Assessment
-*   **Status:** No specific CVEs were identified or associated with this alert. The activity is categorized as a behavioral event rather than an exploit of a known software vulnerability.
+### 2. MITRE ATT&CK Correlation
+The observed activity maps to the following tactics and techniques:
 
-## 4. Assessment
-*   **Severity:** **Medium**
-*   **Priority:** **Medium**
-*   **Rationale:** The activity represents a potential lateral movement vector. Without context regarding whether `user1` is authorized to access `sept` from `fleatbottom`, this must be treated as a security event requiring verification.
+*   **Discovery (TA0007):**
+    *   **T1057 - Process Discovery:** The repeated execution of `ps auxwww` by the `www-data` user indicates an attempt to map running processes on the system.
+*   **Defense Evasion (TA0005):**
+    *   **T1070 - Indicator Removal on Host:** The "Agent event queue is full" condition, while potentially a DoS, is often used to mask malicious activity by overwhelming the logging infrastructure, preventing security teams from seeing the subsequent stages of an attack.
 
-## 5. Recommended Response Actions
-1.  **Verify Authorization:** Confirm with the system administrator or the owner of `user1` if this RDP session was a scheduled or authorized administrative task.
-2.  **Review Logs:** Examine logs on host `sept` for concurrent activity, such as command execution, file modifications, or privilege escalation attempts following the RDP login.
-3.  **Check Account Activity:** Investigate if `user1` has exhibited unusual behavior or if there have been multiple failed login attempts preceding this successful connection.
-4.  **Containment (If Unauthorized):** If the activity is deemed unauthorized, immediately terminate the RDP session, disable the `user1` account, and isolate host `fleatbottom` for forensic analysis.
-5.  **Policy Review:** Ensure that RDP access is restricted to authorized users and specific jump hosts via Group Policy or firewall rules to minimize the attack surface.
+### 3. Assessment
+*   **Severity:** **High**
+*   **Priority:** **Critical**
+*   **Reasoning:** The combination of unauthorized process enumeration by a web service user (`www-data`) and the subsequent flooding of the security agent suggests an active attempt to perform reconnaissance while simultaneously blinding the security monitoring system. This is a strong indicator of a potential compromise of a web application.
+
+### 4. Recommended Response Actions
+
+1.  **Immediate Containment:**
+    *   Isolate the `videoserver` (172.17.100.121) from the network if possible, or restrict access to the web service running under the `www-data` user.
+2.  **Investigation:**
+    *   Inspect the web server logs (e.g., Apache/Nginx) on `videoserver` to identify the source of the `ps` command execution.
+    *   Check for web shells or vulnerable web applications that may be allowing remote code execution (RCE).
+    *   Review the `www-data` user's activity for any other unauthorized commands or network connections.
+3.  **Remediation:**
+    *   Kill the malicious processes identified via the `ps` audit logs.
+    *   Patch the vulnerable web application or remove any identified web shells.
+    *   Increase the `buffer` size in the Wazuh agent configuration (`ossec.conf`) if the volume is legitimate, though this should only be done after confirming the traffic is not malicious.
+4.  **Recovery:**
+    *   Verify that the agent queue has cleared and that the agent is successfully communicating with the manager.
+    *   Monitor for further signs of reconnaissance or lateral movement.

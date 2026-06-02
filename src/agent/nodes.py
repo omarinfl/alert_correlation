@@ -13,7 +13,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_KEY = os.getenv('GEMINI_TOKEN')
+DATAPATH = os.getenv('DATA')
+
 llm = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2)
+# llm = ChatGoogleGenerativeAI(model='gemma-4-31b-it', api_key=API_KEY, temperature=0.2)
 
 embedder = SentenceTransformerEmbedder()
 cve_store = ElasticSearchVectorStore(index_name='cve_index')
@@ -88,14 +91,36 @@ def cve_search_node(state: AgentState) -> AgentState:
                     "-----------------" for r in results])
     return {'cve_data': results_text}
 
+
+def alert_context_node(state: AgentState, window_size: int = 10) -> AgentState:
+    '''Node that retrieves previous and subsequent alerts to provide context to the agent.'''
+    try:
+        import pandas as pd
+        df = pd.read_csv(DATAPATH)
+        df.timestamp = pd.to_datetime(df.timestamp)
+        alert_time = pd.to_datetime(state['original_alert']['timestamp'])
+
+        previous_alerts = df[df['timestamp'] < alert_time].tail(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
+        subsequent_alerts = df[df['timestamp'] > alert_time].head(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
+
+        context_window = previous_alerts.to_dict(orient='records') + subsequent_alerts.to_dict(orient='records')
+    except Exception as e:
+        print(f"Error occurred while retrieving alert context: {e}")
+        context_window = []
+    return {'context_window': context_window}
+
+
 def validation_node(state: AgentState) -> AgentState:
     '''Node that validates the relevance of the retrieved MITRE and CVE information.'''
     
     prompt = f'''
     You are a SOC analyst. Your task is to evaluate the relevance of the retrieved MITRE techniques and CVE vulnerabilities from an automatic search system.
     You must evaluate if each result is actually relevant to the original alert or whether it is semantic noise (for example, a MITRE technique that shares some keywords with the alert but is not actually related to the attack described in the alert).
+    You also have a context window with previous and subsequent alerts that can help you understand better the situation and the relevance of the retrieved information. Use it to determine if the retrieved MITRE techniques and CVE vulnerabilities are actually relevant or are noise.
     
     ORIGINAL ALERT: {state['original_alert']}
+
+    CONTEXT WINDOW: {state['context_window']}
 
     EXTRACTED MITRE RESULTS: {state['mitre_data']}
     
@@ -134,6 +159,7 @@ def final_report_node(state: AgentState) -> AgentState:
     user_input = f'''
     Original Alert: {state['original_alert']}
     Classification: {state['classification']}
+    CONTEXT WINDOW: {state['context_window']}
     MITRE Information: {validated_mitre}
     CVE Information: {validated_cve}'''
 

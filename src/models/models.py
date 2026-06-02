@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Annotated, TypedDict, List
+from typing import Annotated, TypedDict, List, Dict
 
 
 class AlertClasification(BaseModel):
@@ -23,7 +23,9 @@ class ValidationReport(BaseModel):
     cve_evaluations: List[ItemEvaluation] = Field(description="A list of evaluations for each CVE item retrieved")
 
 class AgentState(TypedDict):
-    original_alert: str
+    original_alert: Dict
+    context_window: List[str] = Field(description="A list of previous and post alerts that can provide context to the agent when analyzing the current alert. This can include previous alerts from the same source, alerts with similar characteristics, or any other relevant information that can help the agent understand the situation better.")
+    
     classification: AlertClasification
     mitre_data: Annotated[str, Field(description="Relevant MITRE information retrieved")]
     cve_data: Annotated[str, Field(description="Relevant CVE information retrieved")]

@@ -1,0 +1,169 @@
+{
+  "original_alert": {
+    "timestamp": "2025-09-22T18:37:19.443+0000",
+    "rule": {
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "id": "203",
+      "firedtimes": 12,
+      "mail": false,
+      "groups": [
+        "wazuh",
+        "agent_flooding"
+      ],
+      "pci_dss": [
+        "10.6.1"
+      ],
+      "gdpr": [
+        "IV_35.7.d"
+      ]
+    },
+    "agent": {
+      "id": "002",
+      "name": "videoserver",
+      "ip": "172.17.100.121"
+    },
+    "manager": {
+      "name": "wazuh"
+    },
+    "id": "1758566239.11503718",
+    "full_log": "wazuh: Agent buffer: 'full'.",
+    "decoder": {
+      "parent": "wazuh",
+      "name": "wazuh"
+    },
+    "data": {
+      "level": "full"
+    },
+    "location": "wazuh-agent"
+  },
+  "context_window": [
+    {
+      "timestamp": "2025-09-22T18:37:10.786000+00:00",
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "fired_times": 8,
+      "full_log": "wazuh: Agent buffer: 'full'."
+    },
+    {
+      "timestamp": "2025-09-22T18:37:12.713000+00:00",
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "fired_times": 9,
+      "full_log": "wazuh: Agent buffer: 'full'."
+    },
+    {
+      "timestamp": "2025-09-22T18:37:14.717000+00:00",
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "fired_times": 10,
+      "full_log": "wazuh: Agent buffer: 'full'."
+    },
+    {
+      "timestamp": "2025-09-22T18:37:17.266000+00:00",
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "fired_times": 11,
+      "full_log": "wazuh: Agent buffer: 'full'."
+    },
+    {
+      "timestamp": "2025-09-22T18:37:18.892000+00:00",
+      "level": 6,
+      "description": "Processes running for all users were queried with ps command.",
+      "fired_times": 2,
+      "full_log": "type=SYSCALL msg=audit(1758566228.862:6639): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e592538 a1=55de6e592478 a2=55de6e592490 a3=8 items=3 ppid=6296 pid=6300 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566228.862:6639): argc=2 a0=\"ps\" a1=\"fauxwww\" type=PATH msg=audit(1758566228.862:6639): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566228.862:6639): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566228.862:6639): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566228.862:6639): proctitle=70730066617578777777"
+    },
+    {
+      "timestamp": "2025-09-22T18:37:20.423000+00:00",
+      "level": 6,
+      "description": "Processes running for all users were queried with ps command.",
+      "fired_times": 3,
+      "full_log": "type=SYSCALL msg=audit(1758566230.022:7251): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e592528 a1=55de6e592468 a2=55de6e592480 a3=7 items=3 ppid=3031 pid=7142 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566230.022:7251): argc=2 a0=\"ps\" a1=\"auxwww\" type=PATH msg=audit(1758566230.022:7251): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.022:7251): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.022:7251): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566230.022:7251): proctitle=707300617578777777"
+    },
+    {
+      "timestamp": "2025-09-22T18:37:20.424000+00:00",
+      "level": 6,
+      "description": "Processes running for all users were queried with ps command.",
+      "fired_times": 4,
+      "full_log": "type=SYSCALL msg=audit(1758566230.034:7253): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e592530 a1=55de6e592450 a2=55de6e592488 a3=1b6 items=3 ppid=3031 pid=7143 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566230.034:7253): argc=2 a0=\"ps\" a1=\"auxwww\" type=PATH msg=audit(1758566230.034:7253): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.034:7253): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.034:7253): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566230.034:7253): proctitle=707300617578777777"
+    },
+    {
+      "timestamp": "2025-09-22T18:37:20.458000+00:00",
+      "level": 6,
+      "description": "Processes running for all users were queried with ps command.",
+      "fired_times": 5,
+      "full_log": "type=SYSCALL msg=audit(1758566230.062:7266): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e592530 a1=55de6e592450 a2=55de6e592488 a3=1b6 items=3 ppid=3031 pid=7146 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566230.062:7266): argc=2 a0=\"ps\" a1=\"auxwww\" type=PATH msg=audit(1758566230.062:7266): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.062:7266): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566230.062:7266): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566230.062:7266): proctitle=707300617578777777"
+    },
+    {
+      "timestamp": "2025-09-22T18:37:20.732000+00:00",
+      "level": 9,
+      "description": "Agent event queue is full. Events may be lost.",
+      "fired_times": 13,
+      "full_log": "wazuh: Agent buffer: 'full'."
+    },
+    {
+      "timestamp": "2025-09-22T18:37:25.103000+00:00",
+      "level": 6,
+      "description": "Processes running for all users were queried with ps command.",
+      "fired_times": 6,
+      "full_log": "type=SYSCALL msg=audit(1758566234.502:9069): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e675730 a1=55de6e675670 a2=55de6e675688 a3=55de6e530f40 items=3 ppid=10030 pid=10031 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566234.502:9069): argc=2 a0=\"ps\" a1=\"auxwww\" type=PATH msg=audit(1758566234.502:9069): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566234.502:9069): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566234.502:9069): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566234.502:9069): proctitle=707300617578777777"
+    }
+  ],
+  "classification": {
+    "mitre_search": true,
+    "mitre_keywords": "agent flooding, event log flooding, denial of service",
+    "mitre_description": "The Wazuh agent on host videoserver (172.17.100.121) reported that its event queue is full, indicating a potential agent flooding scenario where excessive logs are generated, which could be used to mask malicious activity or cause a denial of service on the monitoring infrastructure.",
+    "cve_search": false,
+    "cve_keywords": "",
+    "cve_description": ""
+  },
+  "mitre_data": "MITRE results:\nTechnique ID: T1499.001\nName: OS Exhaustion Flood\nDescription: Adversaries may launch a denial of service (DoS) attack targeting an endpoint's operating system (OS). A system's OS is responsible for managing the finite resources as well as preventing the entire system from being overwhelmed by excessive demands on its capacity. These attacks do not need to exhaust the actual resources on a system; the attacks may simply exhaust the limits and available resources that an OS self-imposes.\n\nDifferent ways to achieve this exist, including TCP state-exhaustion attacks such as SYN floods and ACK floods.(Citation: Arbor AnnualDoSreport Jan 2018) With SYN floods, excessive amounts of SYN packets are sent, but the 3-way TCP handshake is never completed. Because each OS has a maximum number of concurrent TCP connections that it will allow, this can quickly exhaust the ability of the system to receive new requests for TCP connections, thus preventing access to any TCP service provided by the server.(Citation: Cloudflare SynFlood)\n\nACK floods leverage the stateful nature of the TCP protocol. A flood of ACK packets are sent to the target. This forces the OS to search its state table for a related TCP connection that has already been established. Because the ACK packets are for connections that do not exist, the OS will have to search the entire state table to confirm that no match exists. When it is necessary to do this for a large flood of packets, the computational requirements can cause the server to become sluggish and/or unresponsive, due to the work it must do to eliminate the rogue ACK packets. This greatly reduces the resources available for providing the targeted service.(Citation: Corero SYN-ACKflood)\nTactics: ['impact']\nPlatforms: ['Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1499.003\nName: Application Exhaustion Flood\nDescription: Adversaries may target resource intensive features of applications to cause a denial of service (DoS), denying availability to those applications. For example, specific features in web applications may be highly resource intensive. Repeated requests to those features may be able to exhaust system resources and deny access to the application or the server itself.(Citation: Arbor AnnualDoSreport Jan 2018)\nTactics: ['impact']\nPlatforms: ['Windows', 'IaaS', 'Linux', 'macOS']\n-----------------\nTechnique ID: T1498.001\nName: Direct Network Flood\nDescription: Adversaries may attempt to cause a denial of service (DoS) by directly sending a high-volume of network traffic to a target. This DoS attack may also reduce the availability and functionality of the targeted system(s) and network. [Direct Network Flood](https://attack.mitre.org/techniques/T1498/001)s are when one or more systems are used to send a high-volume of network packets towards the targeted service's network. Almost any network protocol may be used for flooding. Stateless protocols such as UDP or ICMP are commonly used but stateful protocols such as TCP can be used as well.\n\nBotnets are commonly used to conduct network flooding attacks against networks and services. Large botnets can generate a significant amount of traffic from systems spread across the global Internet. Adversaries may have the resources to build out and control their own botnet infrastructure or may rent time on an existing botnet to conduct an attack. In some of the worst cases for distributed DoS (DDoS), so many systems are used to generate the flood that each one only needs to send out a small amount of traffic to produce enough volume to saturate the target network. In such circumstances, distinguishing DDoS traffic from legitimate clients becomes exceedingly difficult. Botnets have been used in some of the most high-profile DDoS flooding attacks, such as the 2012 series of incidents that targeted major US banks.(Citation: USNYAG IranianBotnet March 2016)\nTactics: ['impact']\nPlatforms: ['Windows', 'IaaS', 'Linux', 'macOS']\n-----------------\nTechnique ID: T1498\nName: Network Denial of Service\nDescription: Adversaries may perform Network Denial of Service (DoS) attacks to degrade or block the availability of targeted resources to users. Network DoS can be performed by exhausting the network bandwidth services rely on. Example resources include specific websites, email services, DNS, and web-based applications. Adversaries have been observed conducting network DoS attacks for political purposes(Citation: FireEye OpPoisonedHandover February 2016) and to support other malicious activities, including distraction(Citation: FSISAC FraudNetDoS September 2012), hacktivism, and extortion.(Citation: Symantec DDoS October 2014)\n\nA Network DoS will occur when the bandwidth capacity of the network connection to a system is exhausted due to the volume of malicious traffic directed at the resource or the network connections and network devices the resource relies on. For example, an adversary may send 10Gbps of traffic to a server that is hosted by a network with a 1Gbps connection to the internet. This traffic can be generated by a single system or multiple systems spread across the internet, which is commonly referred to as a distributed DoS (DDoS).\n\nTo perform Network DoS attacks several aspects apply to multiple methods, including IP address spoofing, and botnets.\n\nAdversaries may use the original IP address of an attacking system, or spoof the source IP address to make the attack traffic more difficult to trace back to the attacking system or to enable reflection. This can increase the difficulty defenders have in defending against the attack by reducing or eliminating the effectiveness of filtering by the source address on network defense devices.\n\nFor DoS attacks targeting the hosting system directly, see [Endpoint Denial of Service](https://attack.mitre.org/techniques/T1499).\nTactics: ['impact']\nPlatforms: ['Windows', 'IaaS', 'Linux', 'macOS', 'Containers']\n-----------------\nTechnique ID: T1496.002\nName: Bandwidth Hijacking\nDescription: Adversaries may leverage the network bandwidth resources of co-opted systems to complete resource-intensive tasks, which may impact system and/or hosted service availability. \n\nAdversaries may also use malware that leverages a system's network bandwidth as part of a botnet in order to facilitate [Network Denial of Service](https://attack.mitre.org/techniques/T1498) campaigns and/or to seed malicious torrents.(Citation: GoBotKR) Alternatively, they may engage in proxyjacking by selling use of the victims' network bandwidth and IP address to proxyware services.(Citation: Sysdig Proxyjacking) Finally, they may engage in internet-wide scanning in order to identify additional targets for compromise.(Citation: Unit 42 Leaked Environment Variables 2024)\n\nIn addition to incurring potential financial costs or availability disruptions, this technique may cause reputational damage if a victim’s bandwidth is used for illegal activities.(Citation: Sysdig Proxyjacking)\nTactics: ['impact']\nPlatforms: ['Linux', 'Windows', 'macOS', 'IaaS', 'Containers']\n-----------------",
+  "cve_data": "No relevant CVE information found in the alert.",
+  "validation_report": {
+    "mitre_evaluations": [
+      {
+        "item_id": "T1499.001",
+        "relevance_score": 0.3,
+        "explanation": "While the alert indicates a resource exhaustion (buffer full), this is a system-level operational issue rather than a malicious OS-level DoS attack. The technique is semantically related to resource exhaustion but contextually misaligned.",
+        "decision": false,
+        "data": ""
+      },
+      {
+        "item_id": "T1499.003",
+        "relevance_score": 0.3,
+        "explanation": "Similar to T1499.001, the alert describes a buffer overflow/full queue condition, which is an operational failure, not an application-level DoS attack.",
+        "decision": false,
+        "data": ""
+      },
+      {
+        "item_id": "T1498.001",
+        "relevance_score": 0.2,
+        "explanation": "The alert is about internal agent queue saturation, not a network-based flood attack from an external source.",
+        "decision": false,
+        "data": ""
+      },
+      {
+        "item_id": "T1498",
+        "relevance_score": 0.2,
+        "explanation": "This refers to network-level DoS, which does not match the internal agent event queue buffer issue described in the alert.",
+        "decision": false,
+        "data": ""
+      },
+      {
+        "item_id": "T1496.002",
+        "relevance_score": 0.1,
+        "explanation": "There is no evidence of bandwidth hijacking or botnet activity; the alert is a standard system warning regarding log processing capacity.",
+        "decision": false,
+        "data": ""
+      }
+    ],
+    "cve_evaluations": []
+  },
+  "final_report": {
+    "type": "text",
+    "text": "# Incident Report: Agent Flooding and Suspicious Process Enumeration\n\n**Date:** 2025-09-22  \n**Host:** `videoserver` (172.17.100.121)  \n**Status:** Active Investigation  \n\n---\n\n### 1. Incident Summary\nThe Wazuh manager reported a recurring \"Agent event queue is full\" alert (Rule 203) on the host `videoserver`. This indicates that the agent is unable to process or transmit logs to the manager, effectively creating a blind spot in monitoring. Correlated logs show frequent execution of the `ps` command by the `www-data` user, suggesting that a web-based service or application on the server is likely being abused to perform process enumeration, which in turn is generating the excessive log volume that triggered the flooding.\n\n### 2. MITRE ATT&CK Correlation\nThe observed activity maps to the following tactics and techniques:\n\n*   **Discovery (TA0007):**\n    *   **T1057 - Process Discovery:** The repeated execution of `ps auxwww` by the `www-data` user indicates an attempt to map running processes on the system.\n*   **Defense Evasion (TA0005):**\n    *   **T1070 - Indicator Removal on Host:** The \"Agent event queue is full\" condition, while potentially a DoS, is often used to mask malicious activity by overwhelming the logging infrastructure, preventing security teams from seeing the subsequent stages of an attack.\n\n### 3. Assessment\n*   **Severity:** **High**\n*   **Priority:** **Critical**\n*   **Reasoning:** The combination of unauthorized process enumeration by a web service user (`www-data`) and the subsequent flooding of the security agent suggests an active attempt to perform reconnaissance while simultaneously blinding the security monitoring system. This is a strong indicator of a potential compromise of a web application.\n\n### 4. Recommended Response Actions\n\n1.  **Immediate Containment:**\n    *   Isolate the `videoserver` (172.17.100.121) from the network if possible, or restrict access to the web service running under the `www-data` user.\n2.  **Investigation:**\n    *   Inspect the web server logs (e.g., Apache/Nginx) on `videoserver` to identify the source of the `ps` command execution.\n    *   Check for web shells or vulnerable web applications that may be allowing remote code execution (RCE).\n    *   Review the `www-data` user's activity for any other unauthorized commands or network connections.\n3.  **Remediation:**\n    *   Kill the malicious processes identified via the `ps` audit logs.\n    *   Patch the vulnerable web application or remove any identified web shells.\n    *   Increase the `buffer` size in the Wazuh agent configuration (`ossec.conf`) if the volume is legitimate, though this should only be done after confirming the traffic is not malicious.\n4.  **Recovery:**\n    *   Verify that the agent queue has cleared and that the agent is successfully communicating with the manager.\n    *   Monitor for further signs of reconnaissance or lateral movement.",
+    "extras": {
+      "signature": "EjQKMgEMOdbHd197MNCoQO2XrRum1lPe2h8IW4Tck/3+4pbMBGdkWlKp6wBUxBr3jmYhaTcB"
+    }
+  }
+}

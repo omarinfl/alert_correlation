@@ -14,3 +14,7 @@ wheels/
 
 # ZIP grande CVEs
 data/cvelistV5-main.zip
+
+# Dataset de manifestaciones y CSV
+data/manifestations_raw
+data/alerts_dataset.csv

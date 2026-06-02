@@ -1,8 +1,10 @@
-DATA_SOURCE='data/alerts_dataset.csv'
-CONTEXT_WINDOW= True # Determinar si se opta por una evaluación directa por ahorrar recursos
-CONTEXT_WINDOW_SIZE=10
+from pydantic import BaseModel, Field
 
-SEARCH_TOP_K=5
+class AgentConfig(BaseModel):
+    use_context_window: bool = Field(default=True, description="Whether to use a context window for alert evaluation")
+    context_window_size: int = Field(default=10, description="Number of alerts to include in the context window")
 
-WRITE_REPORT=True # Escribir o no el informe final
-REPORT_PATH='reports/alert_report.txt'
+    generate_report: bool = Field(default=True, description="Whether to generate a final report after processing the alert")
+    report_dir: str = Field(default='reports', description="Directory where reports will be saved")
+
+    mitre_top_k: int = Field(default=5, description="Number of top results to retrieve from searches")

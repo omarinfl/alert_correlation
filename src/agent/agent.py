@@ -1,25 +1,27 @@
 from .nodes import make_classification_node, make_mitre_search_node, make_cve_search_node, make_validation_node, make_final_report_node, make_alert_context_node
 from ..models.models import AgentState
 from langgraph.graph import StateGraph, END
+import time
 
 class SOCAgent:
-    def __init__(self, config, llm, alert_data, embedder, mitre_store, cve_store):
+    def __init__(self, config, llm, alert_data, embedder, mitre_store, cve_store, tracker):
         self.config = config
         self.llm = llm
         self.alert_data = alert_data
         self.embedder = embedder
         self.mitre_store = mitre_store
         self.cve_store = cve_store
+        self.tracker = tracker
         self.app = self._build_app()
 
     def _build_app(self):
         workflow = StateGraph(AgentState)
-        workflow.add_node('classification', make_classification_node(self.llm))
-        workflow.add_node('mitre_search_node', make_mitre_search_node(self.embedder, self.mitre_store, self.config))
-        workflow.add_node('cve_search_node', make_cve_search_node(self.embedder, self.cve_store))
-        workflow.add_node('alert_context_node', make_alert_context_node(self.config, self.alert_data))
-        workflow.add_node('validation_node', make_validation_node(self.llm))
-        workflow.add_node('final_report_node', make_final_report_node(self.config, self.llm))
+        workflow.add_node('classification', make_classification_node(self.llm, self.tracker))
+        workflow.add_node('mitre_search_node', make_mitre_search_node(self.embedder, self.mitre_store, self.config, self.tracker))
+        workflow.add_node('cve_search_node', make_cve_search_node(self.embedder, self.cve_store, self.tracker))
+        workflow.add_node('alert_context_node', make_alert_context_node(self.config, self.alert_data, self.tracker))
+        workflow.add_node('validation_node', make_validation_node(self.llm, self.tracker))
+        workflow.add_node('final_report_node', make_final_report_node(self.config, self.llm, self.tracker))
 
         workflow.set_entry_point('classification')
 
@@ -36,6 +38,9 @@ class SOCAgent:
     
     def process_alert(self, alert: dict):
         inputs = {'original_alert': alert}
+        self.tracker.reset()  # Reiniciamos el tracker para esta nueva alerta
+        start_time = time.time()
+
         for event in self.app.stream(inputs, stream_mode='updates'):
             for node_name, node_state in event.items():
                 print(f'\nNODO: [{node_name}]')
@@ -57,3 +62,17 @@ class SOCAgent:
 
                 if 'final_report' in node_state:
                     print(f"Final Report: {node_state['final_report']}")
+
+        execution_time = time.time() - start_time
+        telemetry = {
+            "execution_time": round(execution_time, 2),
+            "token_usage": {
+                "prompt_tokens": self.tracker.total_prompt_tokens,
+                "completion_tokens": self.tracker.total_completion_tokens,
+                "total_tokens": self.tracker.total_prompt_tokens + self.tracker.total_completion_tokens
+            },
+            "llm_calls": self.tracker.llm_calls,
+            "node_breakdown": self.tracker.node_metrics
+        }
+
+        return event, telemetry

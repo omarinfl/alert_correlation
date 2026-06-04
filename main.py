@@ -4,6 +4,8 @@ from src.retrieval.store import ElasticSearchVectorStore
 from src.agent.agent import SOCAgent
 from src.agent.data_access import CSVAlertData
 from src.agent.config import AgentConfig
+from src.evaluation.data_saver import CSVDataSaver
+from src.models.models import AlertLog, EvaluationResult
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import pandas as pd
@@ -32,12 +34,17 @@ def main():
     cve_store = ElasticSearchVectorStore(index_name='cve_index')
     mitre_store = ElasticSearchVectorStore(index_name='mitre_attack')
 
+    data_saver = CSVDataSaver(alerts_csv_path='reports/alerts_results.csv', evaluations_csv_path='reports/evaluations_results.csv')
     agent = SOCAgent(config, llm, alert_data, embedder, mitre_store, cve_store)
     
     # Simular procesamiento de una alerta
     df = pd.read_csv('data/mini_dataset_parsed.csv', parse_dates=['timestamp'])
     sample_alert = json.loads(df.iloc[8]['alert'])
-    agent.process_alert(sample_alert)
+    analysis_result = agent.process_alert(sample_alert)
+
+    # Save the results
+    data_saver.save_alert_log(analysis_result)
+    data_saver.save_evaluation_result(analysis_result.evaluation)
 
 
 if __name__ == "__main__":

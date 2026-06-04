@@ -4,14 +4,13 @@ from datetime import datetime
 from models import AlertLog, EvaluationResult # Tus Pydantic models
 
 class EvaluationRunner:
-    def __init__(self, agent, data_saver, dataset_name: str, config: dict):
+    def __init__(self, agent, data_saver, config: dict):
         self.agent = agent
         self.data_saver = data_saver
-        self.dataset_name = dataset_name
         self.config = config
         self.evaluation_id = f"EVAL-{uuid.uuid4().hex[:6].upper()}"
 
-    def run_evaluation(self, dataset_df):
+    def run_evaluation(self, dataset_df, dataset_name: str):
         print(f"🚀 Iniciando Evaluación: {self.evaluation_id}")
         
         total_alerts = 0
@@ -75,7 +74,7 @@ class EvaluationRunner:
         
         eval_result = EvaluationResult(
             evaluation_id=self.evaluation_id,
-            dataset_name=self.dataset_name,
+            dataset_name=dataset_name,
             agent_config=self.config,
             agent_components={"llm": "tu_llm", "embedder": "tu_embedder"},
             alerts_evaluated=total_alerts,

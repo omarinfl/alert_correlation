@@ -74,12 +74,8 @@ techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtra
 documents = []
 for t in techniques:
     print(f"Procesando técnica: {t.name}")
-    text_to_embed = f'''ID: {mitre_data.get_attack_id(t.id)}.
-                        Name: {t.name}.
-                        Tactics: {",".join([phase.phase_name for phase in t.kill_chain_phases])}.
-                        Description: {t.description}.
-                        Platforms: {t.x_mitre_platforms}'''
-    
+    text_to_embed = f'''The technique {t.name}(ID: {mitre_data.get_attack_id(t.id)}) belongs to the {",".join([phase.phase_name for phase in t.kill_chain_phases])} tactics.
+                        {t.description}. It is used on platforms: {t.x_mitre_platforms}'''
     
     doc = {
         'id': t.id,

@@ -71,33 +71,30 @@ class ElasticSearchVectorStore(VectorStore):
     
     def search_mitre_hybrid(self, query_vector, query_text, top_k=5):
         query = {
-            "size": top_k,
-            "query": {
-                "bool": {
-                    "should": [
-                        # 1. Búsqueda Vectorial (Semántica)
-                        {
-                            "knn": {
-                                "field": "vector",
-                                "query_vector": query_vector,
-                                "k": top_k,
-                                "boost": 0.5 # Le damos la mitad del peso al vector
-                            }
-                        },
-                        # 2. Búsqueda Exacta BM25 (Palabras clave)
-                        {
-                            "match": {
-                                "description": {
-                                    "query": query_text, # Aquí le pasas las 'keywords' generadas por el LLM
-                                    "boost": 0.5 # La otra mitad a la coincidencia exacta
-                                }
-                            }
-                        }
-                    ]
-                }
-            },
-            "_source": ["technique_id", "name", "description"]
-        }
+                "size": top_k,
+                
+                # 1. Búsqueda Vectorial (k-NN)
+                "knn": {
+                    "field": "vector",
+                    "query_vector": query_vector,
+                    "k": top_k,
+                    "num_candidates": 100,
+                    "boost": 0.9  # El vector vuelve a ser el jefe (90% del peso)
+                },
+                
+                # 2. Búsqueda de Texto (Multi-Match) balanceada
+                "query": {
+                    "multi_match": {
+                        "query": query_text,
+                        # Buscamos en el nombre (con peso x3), en el ID y en la descripción
+                        "fields": ["name^3", "technique_id^2", "tactics", "description", "procedures", "detections"],
+                        "boost": 0.05 # Un peso muy bajito para que no rompa la escala del 0 al 1
+                    }
+                },
+                
+                # # 3. Traemos el Payload
+                # "_source": ["technique_id", "name", "description", "detections", "mitigations"]
+            }
         
         response = self.client.search(index=self.index_name, body=query)
         return [hit['_source'] for hit in response['hits']['hits']]

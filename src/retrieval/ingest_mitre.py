@@ -3,6 +3,151 @@ from store import ElasticSearchVectorStore
 from mitreattack.stix20 import MitreAttackData
 import requests
 import os
+import re
+
+def limpiar_texto_mitre(texto):
+    if not texto:
+        return ""
+    
+    # 1. Eliminar citaciones de MITRE: (Citation: Nombre Año)
+    texto = re.sub(r'\(Citation:\s*[^)]+\)', '', texto)
+    
+    # 2. Limpiar enlaces Markdown: [Texto](URL) -> Nos quedamos solo con 'Texto'
+    texto = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', texto)
+    
+    # 3. Limpiar espacios en blanco extras que hayan quedado
+    texto = re.sub(r'\s+', ' ', texto).strip()
+    
+    return texto
+
+
+def obtener_procedimientos(mitre_data, technique_stix_id):
+    """Extrae ejemplos reales de software y grupos APT usando la técnica."""
+    texto_procedimientos = []
+    
+    # 1. Software (Malware/Herramientas) que usan la técnica
+    try:
+        software_using = mitre_data.get_software_using_technique(technique_stix_id)
+        for item in software_using:
+            desc = ''
+            obj = item['object']
+            rels = item['relationships']   
+            nombre = getattr(obj, 'name', '')
+            for rel in rels:
+                desc += f'{getattr(rel, 'description', '') }'
+            if nombre:
+                desc = limpiar_texto_mitre(desc)
+                texto_procedimientos.append(f"Software '{nombre}': {desc}")
+    except Exception:
+        pass
+
+    # 2. Grupos (APTs) que usan la técnica
+    try:
+        groups_using = mitre_data.get_groups_using_technique(technique_stix_id)
+        for item in groups_using:
+            desc = ''
+            obj = item['object']
+            rels = item['relationships']   
+            nombre = getattr(obj, 'name', '')
+            for rel in rels:
+                desc += f'{getattr(rel, 'description', '') }'
+            if nombre:
+                desc = limpiar_texto_mitre(desc)
+                texto_procedimientos.append(f"Group '{nombre}': {desc}")
+    except Exception:
+        pass
+
+    # 3. CAMPAÑAS (¡Añadido!)
+    try:
+        # La librería expone este método para las relaciones con campañas
+        campaigns_using = mitre_data.get_campaigns_using_technique(technique_stix_id)
+        for item in campaigns_using:
+            desc = ''
+            obj = item['object']
+            rels = item['relationships']   
+            nombre = getattr(obj, 'name', '')
+            for rel in rels:
+                desc += f'{getattr(rel, 'description', '') }'
+            if nombre:
+                desc = limpiar_texto_mitre(desc)
+                texto_procedimientos.append(f"Campaign '{nombre}': {desc}")
+    except Exception:
+        pass
+
+    return "\n".join(texto_procedimientos)
+
+
+def obtener_mitigaciones(mitre_data, technique_stix_id):
+    """Extrae las contramedidas y mitigaciones recomendadas por MITRE."""
+    texto_mitigaciones = []
+    try:
+        mitigations = mitre_data.get_mitigations_mitigating_technique(technique_stix_id)
+        for item in mitigations:
+            desc = ''
+            obj = item['object']
+            rels = item['relationships']   
+            nombre = getattr(obj, 'name', '')
+            for rel in rels:
+                desc += f'{getattr(rel, 'description', '') }'
+            if nombre:
+                desc = limpiar_texto_mitre(desc)
+                texto_mitigaciones.append(f"Mitigation '{nombre}': {desc}")
+    except Exception:
+        pass
+    return "\n".join(texto_mitigaciones)
+
+
+def obtener_detecciones(mitre_data, technique_stix_id):
+    """
+    Recorre las estrategias de detección de una técnica, busca sus analíticas
+    asociadas y extrae la descripción técnica real y las queries si existen.
+    """
+    texto_detecciones = []
+    
+    try:
+        # 1. Obtenemos las estrategias de detección asociadas a la técnica
+        strategies = mitre_data.get_detection_strategies_detecting_technique(technique_stix_id)
+        
+        for item in strategies:
+            strategy_obj = item['object']
+            strategy_name = getattr(strategy_obj, 'name', '')
+            
+            # Inicializamos el bloque de texto para esta estrategia
+            bloque_estrategia = f"Detection Strategy: {strategy_name}\n"
+            
+            # 2. Extraemos la lista de IDs de las analíticas asociadas
+            analytic_refs = getattr(strategy_obj, 'x_mitre_analytic_refs', [])
+            
+            # 3. Iteramos por cada analítica para extraer su 'description'
+            for ref in analytic_refs:
+                # Resolvemos el STIX ID para traer el objeto Analítica completo
+                analytic_obj = mitre_data.get_object_by_stix_id(ref)
+                
+                if analytic_obj:
+                    analytic_name = getattr(analytic_obj, 'name', '')
+                    analytic_desc = getattr(analytic_obj, 'description', '')
+                    
+                    # Limpiamos la descripción con la función de Regex creada antes
+                    desc_limpia = limpiar_texto_mitre(analytic_desc)
+                    
+                    bloque_estrategia += f"- Analytic '{analytic_name}': {desc_limpia}\n"
+                    
+                    # TIP DE CALIDAD PARA EL TFM:
+                    # Las analíticas a veces incluyen las reglas de detección exactas (Queries)
+                    # en campos como 'x_mitre_rules' o similares dependiendo de la plataforma.
+                    # Si existen, añadirlas al texto es oro puro para el BM25.
+                    if hasattr(analytic_obj, 'x_mitre_rules'):
+                        bloque_estrategia += f"  Detection Rules: {analytic_obj.x_mitre_rules}\n"
+            
+            texto_detecciones.append(bloque_estrategia)
+            
+    except Exception as e:
+        # En caso de que alguna técnica antigua no tenga este nuevo formato de mapeo
+        pass
+        
+    return "\n".join(texto_detecciones)
+
+
 
 def download_mitre_attack_data():
     '''Descarga el archivo MITRE ATT&CK desde GitHub solo si hay una nueva versión disponible.'''
@@ -48,8 +193,9 @@ def download_mitre_attack_data():
         return None
 
 print("Inicializando módulos...")
-embedder = SentenceTransformerEmbedder()
-vector_store = ElasticSearchVectorStore(index_name='mitre_attack_v2')
+# embedder = SentenceTransformerEmbedder()
+embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
+vector_store = ElasticSearchVectorStore(index_name='mitre_attack_v3_bge_small')
 
 # embedder = LocalvLLMEmbedder()
 # vector_store = ElasticSearchVectorStore(index_name='mitre_attack_bge')
@@ -74,8 +220,22 @@ techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtra
 documents = []
 for t in techniques:
     print(f"Procesando técnica: {t.name}")
+    
+    description = limpiar_texto_mitre(t.description)
+    procedures_txt = obtener_procedimientos(mitre_data, t.id)
+    mitigations_txt = obtener_mitigaciones(mitre_data, t.id)
+    detections_txt = obtener_detecciones(mitre_data, t.id)
+    
     text_to_embed = f'''The technique {t.name}(ID: {mitre_data.get_attack_id(t.id)}) belongs to the {",".join([phase.phase_name for phase in t.kill_chain_phases])} tactics.
-                        {t.description}. It is used on platforms: {t.x_mitre_platforms}'''
+                        {description}. It is used on platforms: {t.x_mitre_platforms}'''
+    
+    text_to_search = f'''{text_to_embed}
+                    PROCEDURE EXAMPLES:
+                    {procedures_txt}
+
+                    DETECTION STRATEGIES:
+                    {detections_txt}
+                    '''
     
     doc = {
         'id': t.id,
@@ -86,7 +246,11 @@ for t in techniques:
         'platforms': t.x_mitre_platforms,
         'is_subtechnique': t.x_mitre_is_subtechnique,
         'external_references': [dict(ref) for ref in t.external_references if ref],
-        'vector': embedder.embed_query(text_to_embed)
+        'mitigations': mitigations_txt,
+        'detections': detections_txt,
+        'procedures': procedures_txt, 
+        'vector': embedder.embed_query(text_to_embed),
+        'text_to_search': text_to_search
     }
 
     documents.append(doc)

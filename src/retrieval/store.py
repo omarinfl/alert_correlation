@@ -68,3 +68,36 @@ class ElasticSearchVectorStore(VectorStore):
 
         response = self.client.search(index=self.index_name, body=query)
         return [hit['_source'] for hit in response['hits']['hits']]
+    
+    def search_mitre_hybrid(self, query_vector, query_text, top_k=5):
+        query = {
+            "size": top_k,
+            "query": {
+                "bool": {
+                    "should": [
+                        # 1. Búsqueda Vectorial (Semántica)
+                        {
+                            "knn": {
+                                "field": "vector",
+                                "query_vector": query_vector,
+                                "k": top_k,
+                                "boost": 0.5 # Le damos la mitad del peso al vector
+                            }
+                        },
+                        # 2. Búsqueda Exacta BM25 (Palabras clave)
+                        {
+                            "match": {
+                                "description": {
+                                    "query": query_text, # Aquí le pasas las 'keywords' generadas por el LLM
+                                    "boost": 0.5 # La otra mitad a la coincidencia exacta
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_source": ["technique_id", "name", "description"]
+        }
+        
+        response = self.client.search(index=self.index_name, body=query)
+        return [hit['_source'] for hit in response['hits']['hits']]

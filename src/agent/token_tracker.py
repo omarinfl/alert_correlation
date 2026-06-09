@@ -1,5 +1,5 @@
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.schema.output import LLMResult
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.outputs import LLMResult
 from typing import Any
 import time
 
@@ -9,8 +9,8 @@ class UniversalTokenTracker(BaseCallbackHandler):
         self.current_node = "unknown"
         
         # Totales globales
-        self.total_prompt_tokens = 0
-        self.total_completion_tokens = 0
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
         self.total_tokens = 0
         self.llm_calls = 0
 
@@ -33,14 +33,16 @@ class UniversalTokenTracker(BaseCallbackHandler):
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
         """Suma los tokens automáticamente al nodo activo."""
         in_tok, out_tok = 0, 0
-        
         # 1. Intento estándar moderno (Funciona nativo con Gemini y nuevos de OpenAI)
         try:
             message = response.generations[0][0].message
             if hasattr(message, 'usage_metadata') and message.usage_metadata:
-                self.prompt_tokens += message.usage_metadata.get('input_tokens', 0)
-                self.completion_tokens += message.usage_metadata.get('output_tokens', 0)
-                self.total_tokens += message.usage_metadata.get('total_tokens', 0)
+                in_tok = message.usage_metadata.get('input_tokens', 0)
+                out_tok = message.usage_metadata.get('output_tokens', 0)
+                total_tok = message.usage_metadata.get('total_tokens', 0)
+                
+                self._save_node_stats(in_tok, out_tok, total_tok)
+                self.llm_calls += 1
                 return # Si lo encontramos aquí, terminamos
         except (AttributeError, IndexError):
             pass
@@ -67,18 +69,27 @@ class UniversalTokenTracker(BaseCallbackHandler):
                 return
         except (AttributeError, IndexError):
             pass
-        
+
+
+    def _save_node_stats(self, in_tok, out_tok, total_tok):
         # Sumamos al nodo activo
         node_stats = self.node_metrics[self.current_node]
         node_stats["prompt_tokens"] += in_tok
         node_stats["completion_tokens"] += out_tok
-        node_stats["total_tokens"] += (in_tok + out_tok)
-        
-        # Sumamos al global
-        self.total_prompt_tokens += in_tok
-        self.total_completion_tokens += out_tok
+        node_stats["total_tokens"] += total_tok
 
-    
+        self.prompt_tokens += in_tok
+        self.completion_tokens += out_tok
+        self.total_tokens += total_tok
+
+        # print(f'Guardadas stats de {self.current_node}')
+        # print(node_stats)
+
+        # print('Tokens totales acumulados de la ejecución')
+        # print(f'Input Tokens: {self.prompt_tokens}')
+        # print(f'Output Tokens: {self.completion_tokens}')
+        # print(f'Total Tokens: {self.total_tokens}')
+
     def reset(self):
         """Reinicia los contadores para la siguiente alerta."""
         self.prompt_tokens = 0

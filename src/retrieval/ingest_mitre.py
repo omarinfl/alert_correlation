@@ -1,4 +1,4 @@
-from embedders import SentenceTransformerEmbedder
+from embedders import SentenceTransformerEmbedder, LocalvLLMEmbedder
 from store import ElasticSearchVectorStore
 from mitreattack.stix20 import MitreAttackData
 import requests
@@ -49,7 +49,10 @@ def download_mitre_attack_data():
 
 print("Inicializando módulos...")
 embedder = SentenceTransformerEmbedder()
-vector_store = ElasticSearchVectorStore(index_name='mitre_attack')
+vector_store = ElasticSearchVectorStore(index_name='mitre_attack_v2')
+
+# embedder = LocalvLLMEmbedder()
+# vector_store = ElasticSearchVectorStore(index_name='mitre_attack_bge')
 
 print("Preparando la base de datos...")
 mitre_columns = {
@@ -61,6 +64,8 @@ mitre_columns = {
 }
 
 vector_store.initialize(dims=384, custom_columns=mitre_columns)
+# vector_store.initialize(dims=1024, custom_columns=mitre_columns)
+
 
 print("Cargando datos de MITRE ATT&CK...")
 mitre_data = MitreAttackData(download_mitre_attack_data())
@@ -69,6 +74,13 @@ techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtra
 documents = []
 for t in techniques:
     print(f"Procesando técnica: {t.name}")
+    text_to_embed = f'''ID: {mitre_data.get_attack_id(t.id)}.
+                        Name: {t.name}.
+                        Tactics: {",".join([phase.phase_name for phase in t.kill_chain_phases])}.
+                        Description: {t.description}.
+                        Platforms: {t.x_mitre_platforms}'''
+    
+    
     doc = {
         'id': t.id,
         'technique_id': mitre_data.get_attack_id(t.id),
@@ -78,7 +90,7 @@ for t in techniques:
         'platforms': t.x_mitre_platforms,
         'is_subtechnique': t.x_mitre_is_subtechnique,
         'external_references': [dict(ref) for ref in t.external_references if ref],
-        'vector': embedder.embed_query(t.description)
+        'vector': embedder.embed_query(text_to_embed)
     }
 
     documents.append(doc)

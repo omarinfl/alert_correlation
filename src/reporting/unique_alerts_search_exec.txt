@@ -1,0 +1,438 @@
+{'timestamp': '2025-09-22T18:37:00.601+0000', 'rule': {'level': 6, 'description': 'Processes running for all users were queried with ps command.', 'id': '92604', 'firedtimes': 1, 'mail': False, 'groups': ['audit_detections']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758566220.11498102', 'full_log': 'type=SYSCALL msg=audit(1758566218.934:4968): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e506188 a1=55de6e4f6c90 a2=55de6e5060f8 a3=1b6 items=3 ppid=3135 pid=3136 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm="ps" exe="/usr/bin/ps" subj==unconfined key="T1166_Seuid_and_Setgid"\x1dARCH=x86_64 SYSCALL=execve AUID="unset" UID="www-data" GID="www-data" EUID="www-data" SUID="www-data" FSUID="www-data" EGID="www-data" SGID="www-data" FSGID="www-data" type=EXECVE msg=audit(1758566218.934:4968): argc=2 a0="ps" a1="auxwww" type=PATH msg=audit(1758566218.934:4968): item=0 name="/usr/bin/ps" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1758566218.934:4968): item=1 name="/usr/bin/ps" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1758566218.934:4968): item=2 name="/lib64/ld-linux-x86-64.so.2" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PROCTITLE msg=audit(1758566218.934:4968): proctitle=707300617578777777', 'decoder': {'parent': 'auditd', 'name': 'auditd'}, 'data': {'audit': {'type': 'SYSCALL', 'id': '4968', 'arch': 'c000003e', 'syscall': '59', 'success': 'yes', 'exit': '0', 'ppid': '3135', 'pid': '3136', 'auid': '4294967295', 'uid': '33', 'gid': '33', 'euid': '33', 'suid': '33', 'fsuid': '33', 'egid': '33', 'sgid': '33', 'fsgid': '33', 'tty': 'pts0', 'session': '4294967295', 'command': 'ps', 'exe': '/usr/bin/ps', 'key': 'T1166_Seuid_and_Setgid', 'execve': {'a0': 'ps', 'a1': 'auxwww'}, 'file': {'name': '/usr/bin/ps', 'inode': '17887', 'mode': '0100755'}}}, 'location': '/var/log/audit/audit.log'}
+['T1057']
+The user www-data executed the command 'ps auxwww' to list all running processes on the system. This behavior is often associated with reconnaissance and system information discovery by an attacker to identify running services or potential targets.
+['T1057', 'T1036.011', 'T1134.004', 'T1003.007', 'T1033']
+ps auxwww, process discovery, system information discovery
+['T1057', 'T1007', 'T1518.002', 'T1518.001', 'T1003.007']
+Processes running for all users were queried with ps command.
+['T1036.011', 'T1552.003', 'T1134.004', 'T1003.007', 'T1057']
+1
+{'alert': 1, 'desc': 1, 'keywords': 1}
+
+{'timestamp': '2025-09-22T18:51:01.034+0000', 'rule': {'level': 3, 'description': 'sshd: authentication success.', 'id': '5715', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sshd', 'authentication_success'], 'gdpr': ['IV_32.2'], 'gpg13': ['7.1', '7.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7'], 'pci_dss': ['10.2.5'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567061.11560697', 'full_log': 'Sep 22 18:51:00 videoserver sshd[17243]: Accepted publickey for root from 10.12.0.222 port 40718 ssh2: ED25519 SHA256:erECc93zjoYONyq1nNcu4EwrYe78nzBExDzOmsokkrc', 'predecoder': {'program_name': 'sshd', 'timestamp': 'Sep 22 18:51:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sshd', 'name': 'sshd'}, 'data': {'srcip': '10.12.0.222', 'srcport': '40718', 'dstuser': 'root'}, 'location': 'journald'}
+['T1078', 'T1021']
+The alert indicates a successful SSH authentication for the root user from a remote IP address using public key authentication. This represents legitimate remote access activity that should be monitored for unauthorized use of administrative accounts.
+['T1563.001', 'T1021.004', 'T1098.004', 'T1556', 'T1621']
+Valid Accounts, SSH, Remote Access
+['T1021', 'T1021.004', 'T1078.004', 'T1078', 'T1133']
+sshd: authentication success.
+['T1021.004', 'T1098.004', 'T1110.001', 'T1021', 'T1550.002']
+3
+{'alert': 2, 'desc': 1, 'keywords': 3}
+
+{'timestamp': '2025-09-22T18:51:01.061+0000', 'rule': {'level': 3, 'description': 'PAM: Login session opened.', 'id': '5501', 'firedtimes': 1, 'mail': False, 'groups': ['pam', 'syslog', 'authentication_success'], 'pci_dss': ['10.2.5'], 'gpg13': ['7.8', '7.9'], 'gdpr': ['IV_32.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567061.11561209', 'full_log': 'Sep 22 18:51:00 videoserver sshd[17243]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)', 'predecoder': {'program_name': 'sshd', 'timestamp': 'Sep 22 18:51:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'pam', 'name': 'pam'}, 'data': {'dstuser': 'root(uid=0)', 'uid': '0'}, 'location': 'journald'}
+['T1078']
+The alert indicates a successful SSH login session opened for the root user on the host videoserver. This behavior relates to the use of valid accounts to access systems.
+['T1021.004', 'T1563.001', 'T1098.004', 'T1563', 'T1021']
+Valid Accounts, SSH login, root access
+['T1021.004', 'T1021', 'T1098.004', 'T1563.001', 'T1078.001']
+PAM: Login session opened.
+['T1556.003', 'T1547.007', 'T1037.002', 'T1547.015', 'T1550.004']
+4
+{'alert': 2, 'desc': 1, 'keywords': 3}
+
+{'timestamp': '2025-09-22T18:51:02.101+0000', 'rule': {'level': 3, 'description': 'Wazuh agent stopped.', 'id': '506', 'firedtimes': 3, 'mail': False, 'groups': ['ossec'], 'pci_dss': ['10.6.1', '10.2.6'], 'gpg13': ['10.1'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.6', 'AU.14', 'AU.5'], 'tsc': ['CC7.2', 'CC7.3', 'CC6.8']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567062.11562798', 'full_log': "ossec: Agent stopped: 'videoserver->any'.", 'decoder': {'parent': 'ossec', 'name': 'ossec'}, 'data': {'extra_data': 'videoserver->any'}, 'location': 'wazuh-remoted'}
+['T1562.001']
+The Wazuh security agent on the host 'videoserver' has stopped, which may indicate an attempt to disable security monitoring or evade detection.
+['T1564.011', 'T1553.005', 'T1125', 'T1653', 'T1556.006']
+Impair Defenses, Indicator Removal on Host
+['T1027.005', 'T1564.006', 'T1685.003', 'T1498.002', 'T1497.002']
+Wazuh agent stopped.
+['T1564.011', 'T1529', 'T1499.004', 'T1556.006', 'T1547.007']
+5
+{'alert': 2, 'desc': 1, 'keywords': 3}
+
+{'timestamp': '2025-09-22T18:53:22.278+0000', 'rule': {'level': 4, 'description': 'First time user executed sudo.', 'id': '5403', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567202.11567373', 'full_log': 'Sep 22 18:53:21 videoserver sudo:     root : PWD=/usr/share/zoneminder/www ; USER=www-data ; COMMAND=/usr/bin/true', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:53:21', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'root', 'dstuser': 'www-data', 'pwd': '/usr/share/zoneminder/www', 'command': '/usr/bin/true'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+The alert indicates that the root user executed the sudo command to switch context to the www-data user, which is a common behavior for privilege escalation or administrative tasks. This activity involves the use of sudo to execute commands as another user.
+['T1548.003', 'T1548.001', 'T1548.004', 'T1204', 'T1189']
+sudo, privilege escalation, abuse of privilege
+['T1548.003', 'T1068', 'T1548', 'T1098', 'T1548.004']
+First time user executed sudo.
+['T1548.003', 'T1548.004', 'T1548.001', 'T1033', 'T1037.005']
+6
+{'alert': 3, 'desc': 2, 'keywords': 4}
+
+{'timestamp': '2025-09-22T18:53:22.295+0000', 'rule': {'level': 3, 'description': 'Successful sudo executed.', 'id': '5407', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo'], 'pci_dss': ['10.2.5', '10.2.2'], 'gpg13': ['7.6', '7.8', '7.13'], 'gdpr': ['IV_32.2'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567202.11568557', 'full_log': 'Sep 22 18:53:21 videoserver sudo:     root : PWD=/usr/share/zoneminder/www ; USER=www-data ; COMMAND=/usr/bin/zmdc.pl check', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:53:21', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'root', 'dstuser': 'www-data', 'pwd': '/usr/share/zoneminder/www', 'command': '/usr/bin/zmdc.pl check'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+The alert indicates a successful sudo execution by the root user to run the command /usr/bin/zmdc.pl as the www-data user. This involves potential privilege escalation or administrative activity within the ZoneMinder application environment.
+['T1559.003', 'T1003.007', 'T1548.003', 'T1007', 'T1548.006']
+sudo, privilege escalation, zmdc.pl
+['T1548', 'T1548.003', 'T1548.004', 'T1548.002', 'T1559.003']
+Successful sudo executed.
+['T1548.003', 'T1548.004', 'T1548.001', 'T1546.016', 'T1069.001']
+7
+{'alert': 4, 'desc': 3, 'keywords': 5}
+
+
+{'timestamp': '2025-09-22T18:56:02.451+0000', 'rule': {'level': 8, 'description': 'New user added to the system.', 'id': '5902', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'adduser'], 'pci_dss': ['10.2.7', '10.2.5', '8.1.2'], 'gpg13': ['4.13'], 'gdpr': ['IV_35.7.d', 'IV_32.2'], 'hipaa': ['164.312.b', '164.312.a.2.I', '164.312.a.2.II'], 'nist_800_53': ['AU.14', 'AC.7', 'AC.2', 'IA.4'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567362.11591429', 'full_log': 'Sep 22 18:56:00 videoserver useradd[1658]: new user: name=webadmin, UID=1003, GID=1003, home=/home/webadmin, shell=/bin/bash, from=none', 'predecoder': {'program_name': 'useradd', 'timestamp': 'Sep 22 18:56:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'useradd', 'name': 'useradd'}, 'data': {'dstuser': 'webadmin', 'uid': '1003', 'gid': '1003', 'home': '/home/webadmin', 'shell': '/bin/bash,'}, 'location': '/var/log/auth.log'}
+['T1136']
+The system detected the creation of a new user account named webadmin via the useradd command on the host videoserver. This activity is a common indicator of persistence or privilege escalation tactics.
+['T1136.002', 'T1125', 'T1078.001', 'T1098.007', 'T1033']
+Create Account, useradd
+['T1136.002', 'T1585', 'T1136.001', 'T1136', 'T1564.002']
+New user added to the system.
+['T1033', 'T1564.002', 'T1136.001', 'T1531', 'T1134.003']
+8
+{'alert': 4, 'desc': 3, 'keywords': 6}
+
+
+{'timestamp': '2025-09-22T18:59:02.613+0000', 'rule': {'level': 3, 'description': 'Successful sudo to ROOT executed.', 'id': '5402', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo'], 'pci_dss': ['10.2.5', '10.2.2'], 'gpg13': ['7.6', '7.8', '7.13'], 'gdpr': ['IV_32.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7', 'AC.6'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567542.11599707', 'full_log': 'Sep 22 18:59:00 videoserver sudo: webadmin : PWD=/home/webadmin ; USER=root ; COMMAND=/usr/bin/lspci', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:59:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'webadmin', 'dstuser': 'root', 'pwd': '/home/webadmin', 'command': '/usr/bin/lspci'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+A user named webadmin successfully executed the command /usr/bin/lspci with root privileges using sudo on the host videoserver.
+['T1548.003', 'T1125', 'T1548.001', 'T1675', 'T1505.006']
+sudo privilege escalation
+['T1548.003', 'T1548.001', 'T1548', 'T1068', 'T1548.004']
+Successful sudo to ROOT executed.
+['T1548.003', 'T1548.001', 'T1548.004', 'T1546.016', 'T1546.017']
+9
+{'alert': 5, 'desc': 4, 'keywords': 7}
+
+
+{'timestamp': '2025-09-22T18:30:36.127+0000', 'rule': {'level': 10, 'description': 'Multiple web server 400 error codes from same source ip.', 'id': '31151', 'frequency': 14, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'web_scan', 'recon'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565836.1693570', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.bas:ShowVolume HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.AP HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.link HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.blt HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.iso-ru HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.xtp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.de HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.10:100 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.nl HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.cfc HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.htpasswd HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.sql HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/borLjZ2z.sql'}, 'location': '/var/www/default/log/access.log'}
+['T1595.002']
+The alert indicates that a source IP address is performing automated web scanning using the Nikto vulnerability scanner, as evidenced by the user-agent string and multiple 404 error codes generated by requests for non-existent files.
+['T1016.001', 'T1595.001', 'T1518.001', 'T1595.002', 'T1596.005']
+Nikto, web scanning, reconnaissance, vulnerability scanning
+['T1595.002', 'T1595', 'T1596.005', 'T1595.001', 'T1592.004']
+Multiple web server 400 error codes from same source ip.
+['T1505.004', 'T1499.003', 'T1071.001', 'T1036.012', 'T1210']
+10
+{'alert': 5, 'desc': 5, 'keywords': 8}
+
+
+{'timestamp': '2025-09-22T18:30:36.260+0000', 'rule': {'level': 6, 'description': 'Suspicious URL access.', 'id': '31516', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'appsec', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565836.1733772', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.bak HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/borLjZ2z.bak'}, 'location': '/var/www/default/log/access.log'}
+['T1055']
+The alert indicates that an external IP address (192.42.1.174) is using the Nikto 2.1.5 vulnerability scanner to perform web reconnaissance and directory enumeration against the server, specifically requesting a backup file.
+['T1046', 'T1016.001', 'T1590.005', 'T1018', 'T1557.004']
+Nikto vulnerability scanner, web application reconnaissance, directory enumeration
+['T1595.002', 'T1595.003', 'T1083', 'T1596.005', 'T1602']
+Suspicious URL access.
+['T1598.003', 'T1204', 'T1189', 'T1204.001', 'T1036.012']
+11
+{'alert': 5, 'desc': 5, 'keywords': 8}
+
+
+{'timestamp': '2025-09-22T18:30:42.254+0000', 'rule': {'level': 6, 'description': 'Common web attack.', 'id': '31104', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.1'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565842.1908930', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000063)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00'}, 'location': '/var/www/default/log/access.log'}
+['T1055', 'T1083', 'T1190']
+The alert indicates a web application vulnerability scan performed by the Nikto tool, specifically targeting the /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi script with a path traversal attempt to access /etc/passwd.
+['T1189', 'T1204', 'T1204.004', 'T1056.003', 'T1033']
+Path Traversal, Web Application Scanning, Nikto
+['T1083', 'T1574.007', 'T1595', 'T1005', 'T1595.003']
+Common web attack.
+['T1584.006', 'T1102.003', 'T1102.002', 'T1583.006', 'T1204']
+14
+{'alert': 5, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:44.272+0000', 'rule': {'level': 10, 'description': 'Multiple common web attacks from same source ip.', 'id': '31153', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2307162', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /cgi-bin/cmd.exe?/c+dir HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000348)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/remind.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000317)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/auoconfig.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000316)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/auoconfig.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000315)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /cgi-bin/%2e%2e/abyss.conf HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000260)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /newuser?Image=../../database/rbsserv.mdb HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000246)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /web-console/ServerInfo.jsp%00 HTTP/1.1" 404 395 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000165)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /scripts/root.exe?/c+dir+c:\\\\+/OG HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000153)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000063)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /%00/ HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000457)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/%00/'}, 'location': '/var/www/default/log/access.log'}
+['T1055', 'T1083']
+The alert indicates an external source IP (192.42.1.174) performing a series of automated web requests characteristic of a vulnerability scanner, specifically identifying as Nikto/2.1.5. The requests target various common web application paths, CGI scripts, and configuration files, which is indicative of reconnaissance and vulnerability discovery activities.
+['T1016.001', 'T1518.001', 'T1595.002', 'T1595.001', 'T1596.005']
+Vulnerability Scanning, Web Application Scanning, Nikto
+['T1595.002', 'T1203', 'T1596.005', 'T1595', 'T1210']
+Multiple common web attacks from same source ip.
+['T1071.001', 'T1499.002', 'T1498.002', 'T1102.002', 'T1036.012']
+16
+{'alert': 5, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:44.772+0000', 'rule': {'level': 6, 'description': 'XSS (Cross Site Scripting) attempt.', 'id': '31105', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.7'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2499993', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000702)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script>'}, 'location': '/var/www/default/log/access.log'}
+['T1059.007']
+The alert indicates a Cross-Site Scripting (XSS) attempt targeting a PHP file via a GET request containing a script tag in the URL parameters. The request originated from an IP address using the Nikto vulnerability scanner.
+['T1189', 'T1598.003', 'T1204', 'T1027.017', 'T1204.004']
+Cross-Site Scripting, XSS, web application attack
+['T1189', 'T1027.017', 'T1204.004', 'T1203', 'T1218.005']
+XSS (Cross Site Scripting) attempt.
+['T1027.017', 'T1059.007', 'T1220', 'T1027.006', 'T1189']
+17
+{'alert': 6, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:44.791+0000', 'rule': {'level': 10, 'description': 'Multiple XSS (Cross Site Scripting) attempts from same source ip.', 'id': '31154', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.7'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2505265', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/uploadimage.php?directory=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000710)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/view.php?path=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000709)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/popups/sectionswindow.php?type=web&link=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000708)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/upload.php?newbanner=1&choice=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000707)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailarticle.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000706)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailfaq.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000705)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailnews.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000704)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /index.php?option=search&searchword=<script>alert(document.cookie);</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000703)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000702)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/navigation.php?directory=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000711)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/administrator/gallery/navigation.php?directory=\\\\\\"<script>alert(document.cookie)</script>'}, 'location': '/var/www/default/log/access.log'}
+['T1059']
+The alert indicates multiple Cross-Site Scripting (XSS) attempts originating from a single source IP address (192.42.1.174). The logs show the use of the Nikto web vulnerability scanner to probe various PHP scripts and parameters with common XSS payloads (e.g., <script>alert(document.cookie)</script>).
+['T1189', 'T1204', 'T1016.001', 'T1027.017', 'T1598.003']
+Cross-Site Scripting, XSS, Web Application Scanning, Nikto
+['T1059.007', 'T1505.003', 'T1027.017', 'T1218.005', 'T1189']
+Multiple XSS (Cross Site Scripting) attempts from same source ip.
+['T1027.017', 'T1598.003', 'T1189', 'T1204', 'T1204.004']
+18
+{'alert': 6, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:45.734+0000', 'rule': {'level': 10, 'description': 'Apache: Multiple Invalid URI requests from same source.', 'id': '30316', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['apache', 'web', 'invalid_request'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7', 'SI.4'], 'pci_dss': ['10.2.4', '11.4'], 'tsc': ['CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565845.2553188', 'previous_output': "[Mon Sep 22 18:30:42.672703 2025] [core:error] [pid 661] [client 192.42.1.174:33238] AH00126: Invalid URI in request 'etc/passwd' 'GET /%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.670697 2025] [core:error] [pid 660] [client 192.42.1.174:33236] AH00126: Invalid URI in request 'windows/win.ini' 'GET /%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/windows/win.ini HTTP/1.1'\n[Mon Sep 22 18:30:42.663635 2025] [core:error] [pid 671] [client 192.42.1.174:33232] AH00126: Invalid URI in request 'etc/passwd' 'GET /../../../../../../../../../../etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.636310 2025] [core:error] [pid 672] [client 192.42.1.174:33224] AH00126: Invalid URI in request 'etc/passwd' 'GET /cgi-bin/ssi//%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.524137 2025] [core:error] [pid 2851] [client 192.42.1.174:33210] AH00126: Invalid URI in request 'etc/passwd' 'GET /DomainFiles/*//../../../../../../../../../../etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.514849 2025] [core:error] [pid 673] [client 192.42.1.174:33202] AH00126: Invalid URI in request '.../boot.ini' 'GET ////./../.../boot.ini HTTP/1.1'\n[Mon Sep 22 18:30:42.510160 2025] [core:error] [pid 661] [client 192.42.1.174:33186] AH00126: Invalid URI in request 'winnt/repair/sam._' 'GET /../../../../winnt/repair/sam._ HTTP/1.1'\n[Mon Sep 22 18:30:42.508486 2025] [core:error] [pid 660] [client 192.42.1.174:33182] AH00126: Invalid URI in request 'boot.ini' 'GET /../../../../../../../../../boot.ini HTTP/1.1'\n[Mon Sep 22 18:30:36.522498 2025] [core:error] [pid 673] [client 192.42.1.174:46936] AH00126: Invalid URI in request '' 'GET . HTTP/1.0'", 'full_log': "[Mon Sep 22 18:30:43.416940 2025] [core:error] [pid 660] [client 192.42.1.174:33410] AH00126: Invalid URI in request 'etc/' 'GET /file/../../../../../../../../etc/ HTTP/1.1'", 'decoder': {'parent': 'apache-errorlog', 'name': 'apache-errorlog'}, 'data': {'srcip': '192.42.1.174', 'srcport': '33410', 'id': 'AH00126'}, 'location': '/var/www/default/log/error.log'}
+['T1499']
+The alert shows multiple HTTP GET requests containing directory traversal sequences (e.g., ../, %2e%2e/) targeting sensitive system files such as /etc/passwd, boot.ini, and winnt/repair/sam._, indicating an attempt to access unauthorized files on the web server.
+['T1204', 'T1189', 'T1036.012', 'T1203', 'T1204.001']
+Path Traversal, Directory Traversal, Web Application Attack
+['T1203', 'T1574.007', 'T1204', 'T1574.009', 'T1608.004']
+Apache: Multiple Invalid URI requests from same source.
+['T1598.003', 'T1036.012', 'T1498.002', 'T1204', 'T1070.010']
+19
+{'alert': 6, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:49.360+0000', 'rule': {'level': 5, 'description': 'Apache: Attempt to access forbidden directory index.', 'id': '30306', 'firedtimes': 1, 'mail': False, 'groups': ['apache', 'web', 'access_denied'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['SA.11', 'AU.14', 'AC.7'], 'pci_dss': ['6.5.8', '10.2.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565849.4398946', 'full_log': '[Mon Sep 22 18:30:44.603660 2025] [autoindex:error] [pid 661] [client 192.42.1.174:33500] AH01276: Cannot serve directory /var/www/default/log/: No matching DirectoryIndex (index.html,index.cgi,index.pl,index.php,index.xhtml,index.htm) found, and server-generated directory index forbidden by Options directive', 'decoder': {'parent': 'apache-errorlog', 'name': 'apache-errorlog'}, 'data': {'srcip': '192.42.1.174', 'srcport': '33500', 'id': 'AH01276'}, 'location': '/var/www/default/log/error.log'}
+['T1190']
+An external client attempted to access a directory on an Apache web server that does not have directory indexing enabled, which is a common reconnaissance technique used to discover files or sensitive information on a web server.
+['T1039', 'T1204', 'T1083', 'T1505.003', 'T1222']
+Directory Listing, Reconnaissance, Web Server
+['T1595.003', 'T1083', 'T1596.005', 'T1039', 'T1119']
+Apache: Attempt to access forbidden directory index.
+['T1222', 'T1189', 'T1222.002', 'T1564.001', 'T1574.008']
+20
+{'alert': 6, 'desc': 5, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:50.167+0000', 'rule': {'level': 7, 'description': 'SQL injection attempt.', 'id': '31103', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack', 'sql_injection'], 'pci_dss': ['6.5', '11.4', '6.5.1'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565850.4557382', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:45 +0000] "GET /xsql/demo/adhocsql/query.xsql?sql=select%20username%20from%20ALL_USERS HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:002811)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/xsql/demo/adhocsql/query.xsql?sql=select%20username%20from%20ALL_USERS'}, 'location': '/var/www/default/log/access.log'}
+['T1190']
+An external IP address performed a SQL injection attempt against a web server using the path /xsql/demo/adhocsql/query.xsql. The request was identified as originating from the Nikto 2.1.5 vulnerability scanner.
+['T1218.008', 'T1190', 'T1055', 'T1559.003', 'T1046']
+SQL injection, Nikto scanner
+['T1505.001', 'T1055', 'T1055.004', 'T1218.008', 'T1602.001']
+SQL injection attempt.
+['T1204.004', 'T1598.003', 'T1055.004', 'T1218.008', 'T1505.001']
+21
+{'alert': 6, 'desc': 6, 'keywords': 9}
+
+
+{'timestamp': '2025-09-22T18:30:57.827+0000', 'rule': {'level': 6, 'description': 'PHP CGI-bin vulnerability attempt.', 'id': '31110', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565857.7405014', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:50 +0000] "GET /?-s HTTP/1.1" 302 459 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:006523)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '302', 'url': '/?-s'}, 'location': '/var/www/default/log/access.log'}
+['T1210']
+The alert indicates a web application vulnerability scan originating from an external IP address using the Nikto scanner tool, specifically targeting PHP CGI-bin configurations.
+['T1189', 'T1176', 'T1595.002', 'T1518.001', 'T1016.001']
+vulnerability scanning, web application scanning, Nikto
+['T1595.002', 'T1203', 'T1596.005', 'T1595', 'T1210']
+PHP CGI-bin vulnerability attempt.
+['T1218.001', 'T1203', 'T1027.010', 'T1027.006', 'T1027.018']
+22
+{'alert': 6, 'desc': 6, 'keywords': 10}
+
+
+{'timestamp': '2025-10-14T11:07:16.201+0000', 'rule': {'level': 6, 'description': 'Executed recursive query of all files using ls command.', 'id': '92605', 'firedtimes': 1, 'mail': False, 'groups': ['audit_detections']}, 'agent': {'id': '001', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1760440036.10131265', 'full_log': 'type=SYSCALL msg=audit(1760440025.642:12360): arch=c000003e syscall=59 success=yes exit=0 a0=7ffea67a8cf0 a1=55921f4b81e0 a2=7ffea67a92b0 a3=7f5bbb0ca800 items=3 ppid=16912 pid=16921 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm="ls" exe="/usr/bin/ls" subj==unconfined key="T1166_Seuid_and_Setgid"\x1dARCH=x86_64 SYSCALL=execve AUID="unset" UID="www-data" GID="www-data" EUID="www-data" SUID="www-data" FSUID="www-data" EGID="www-data" SGID="www-data" FSGID="www-data" type=EXECVE msg=audit(1760440025.642:12360): argc=3 a0="ls" a1="-l" a2="/etc/.java/.systemPrefs/.systemRootModFile" type=PATH msg=audit(1760440025.642:12360): item=0 name="/usr/bin/ls" inode=827 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1760440025.642:12360): item=1 name="/usr/bin/ls" inode=827 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1760440025.642:12360): item=2 name="/lib64/ld-linux-x86-64.so.2" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PROCTITLE msg=audit(1760440025.642:12360): proctitle=66696E64002F002D747970650066002D696E616D65002E2A0021002D70617468002F7379732F2A0021002D70617468002F53797374656D2F2A0021002D70617468002F707269766174652F7661722F2A002D65786563006C73002D6C007B7D003B', 'decoder': {'parent': 'auditd', 'name': 'auditd'}, 'data': {'audit': {'type': 'SYSCALL', 'id': '12360', 'arch': 'c000003e', 'syscall': '59', 'success': 'yes', 'exit': '0', 'ppid': '16912', 'pid': '16921', 'auid': '4294967295', 'uid': '33', 'gid': '33', 'euid': '33', 'suid': '33', 'fsuid': '33', 'egid': '33', 'sgid': '33', 'fsgid': '33', 'tty': 'pts0', 'session': '4294967295', 'command': 'ls', 'exe': '/usr/bin/ls', 'key': 'T1166_Seuid_and_Setgid', 'execve': {'a0': 'ls', 'a1': '-l', 'a2': '/etc/.java/.systemPrefs/.systemRootModFile'}, 'file': {'name': '/usr/bin/ls', 'inode': '827', 'mode': '0100755'}}}, 'location': '/var/log/audit/audit.log'}
+['T1083']
+The alert indicates that the user 'www-data' executed a recursive file search and listing operation using 'find' and 'ls' commands, targeting system and configuration directories. This behavior is indicative of reconnaissance or enumeration activities often performed by an attacker to map the file system.
+['T1204', 'T1189', 'T1518.001', 'T1039', 'T1564.013']
+ls, find, discovery, enumeration, T1166
+['T1518.002', 'T1083', 'T1596.005', 'T1595.003', 'T1518.001']
+Executed recursive query of all files using ls command.
+['T1083', 'T1025', 'T1070.004', 'T1005', 'T1003.001']
+23
+{'alert': 7, 'desc': 6, 'keywords': 11}
+
+
+{'timestamp': '2025-12-15T11:10:46.939+0000', 'rule': {'level': 8, 'description': 'Interface entered in promiscuous(sniffing) mode.', 'id': '5104', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'linuxkernel', 'promisc'], 'pci_dss': ['10.6.1', '11.4'], 'gpg13': ['4.13'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.6', 'SI.4'], 'tsc': ['CC7.2', 'CC7.3', 'CC6.1', 'CC6.8']}, 'agent': {'id': '001', 'name': 'inetfw', 'ip': '192.168.100.254'}, 'manager': {'name': 'wazuh'}, 'id': '1765797046.991278', 'full_log': 'Dec 15 11:10:45 inetfw kernel: [ 1638.994908] device ens3 entered promiscuous mode', 'predecoder': {'program_name': 'kernel', 'timestamp': 'Dec 15 11:10:45', 'hostname': 'inetfw'}, 'decoder': {'name': 'kernel'}, 'location': '/var/log/kern.log'}
+['T1040']
+The system detected that the network interface 'ens3' on host 'inetfw' has entered promiscuous mode, which allows the interface to capture all network traffic passing through it, a common technique used for network sniffing and reconnaissance.
+['T1040', 'T1016.001', 'T1095', 'T1018', 'T1205.002']
+network sniffing, promiscuous mode, packet capture
+['T1040', 'T1071.002', 'T1071.001', 'T1016.001', 'T1205.001']
+Interface entered in promiscuous(sniffing) mode.
+['T1040', 'T1095', 'T1205.001', 'T1205.002', 'T1056']
+24
+{'alert': 8, 'desc': 7, 'keywords': 12}
+
+
+
+Con top 10
+
+{'timestamp': '2025-09-22T18:37:00.601+0000', 'rule': {'level': 6, 'description': 'Processes running for all users were queried with ps command.', 'id': '92604', 'firedtimes': 1, 'mail': False, 'groups': ['audit_detections']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758566220.11498102', 'full_log': 'type=SYSCALL msg=audit(1758566218.934:4968): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e506188 a1=55de6e4f6c90 a2=55de6e5060f8 a3=1b6 items=3 ppid=3135 pid=3136 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm="ps" exe="/usr/bin/ps" subj==unconfined key="T1166_Seuid_and_Setgid"\x1dARCH=x86_64 SYSCALL=execve AUID="unset" UID="www-data" GID="www-data" EUID="www-data" SUID="www-data" FSUID="www-data" EGID="www-data" SGID="www-data" FSGID="www-data" type=EXECVE msg=audit(1758566218.934:4968): argc=2 a0="ps" a1="auxwww" type=PATH msg=audit(1758566218.934:4968): item=0 name="/usr/bin/ps" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1758566218.934:4968): item=1 name="/usr/bin/ps" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1758566218.934:4968): item=2 name="/lib64/ld-linux-x86-64.so.2" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PROCTITLE msg=audit(1758566218.934:4968): proctitle=707300617578777777', 'decoder': {'parent': 'auditd', 'name': 'auditd'}, 'data': {'audit': {'type': 'SYSCALL', 'id': '4968', 'arch': 'c000003e', 'syscall': '59', 'success': 'yes', 'exit': '0', 'ppid': '3135', 'pid': '3136', 'auid': '4294967295', 'uid': '33', 'gid': '33', 'euid': '33', 'suid': '33', 'fsuid': '33', 'egid': '33', 'sgid': '33', 'fsgid': '33', 'tty': 'pts0', 'session': '4294967295', 'command': 'ps', 'exe': '/usr/bin/ps', 'key': 'T1166_Seuid_and_Setgid', 'execve': {'a0': 'ps', 'a1': 'auxwww'}, 'file': {'name': '/usr/bin/ps', 'inode': '17887', 'mode': '0100755'}}}, 'location': '/var/log/audit/audit.log'}
+['T1057']
+The user 'www-data' executed the command 'ps auxwww' to list all running processes on the system. This behavior is often associated with reconnaissance and discovery phases in an attack lifecycle to identify running services, users, or potential targets.
+['T1057', 'T1036.011', 'T1134.004', 'T1003.007', 'T1007', 'T1033', 'T1543.004', 'T1564.013', 'T1543', 'T1543.001']
+ps auxwww, process discovery, system information discovery
+['T1057', 'T1007', 'T1518.002', 'T1518.001', 'T1003.007', 'T1134.004', 'T1082', 'T1036.009', 'T1083', 'T1036.011']
+Processes running for all users were queried with ps command.
+['T1036.011', 'T1552.003', 'T1134.004', 'T1003.007', 'T1057', 'T1033', 'T1546.013', 'T1039', 'T1070.003', 'T1564.010']
+1
+{'alert': 1, 'desc': 1, 'keywords': 1}
+{'timestamp': '2025-09-22T18:51:01.034+0000', 'rule': {'level': 3, 'description': 'sshd: authentication success.', 'id': '5715', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sshd', 'authentication_success'], 'gdpr': ['IV_32.2'], 'gpg13': ['7.1', '7.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7'], 'pci_dss': ['10.2.5'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567061.11560697', 'full_log': 'Sep 22 18:51:00 videoserver sshd[17243]: Accepted publickey for root from 10.12.0.222 port 40718 ssh2: ED25519 SHA256:erECc93zjoYONyq1nNcu4EwrYe78nzBExDzOmsokkrc', 'predecoder': {'program_name': 'sshd', 'timestamp': 'Sep 22 18:51:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sshd', 'name': 'sshd'}, 'data': {'srcip': '10.12.0.222', 'srcport': '40718', 'dstuser': 'root'}, 'location': 'journald'}
+['T1078', 'T1021']
+The alert indicates a successful SSH authentication for the root user from a remote IP address using public key authentication. This represents a remote access event that should be reviewed to ensure the source IP and user account are authorized.
+['T1098.004', 'T1563.001', 'T1021.004', 'T1553.004', 'T1621', 'T1556', 'T1563', 'T1552.004', 'T1056.003', 'T1204']
+Valid Accounts, SSH, Remote Access
+['T1021', 'T1021.004', 'T1078.004', 'T1078', 'T1133', 'T1136', 'T1078.003', 'T1098.004', 'T1110.004', 'T1556']
+sshd: authentication success.
+['T1021.004', 'T1098.004', 'T1110.001', 'T1021', 'T1550.002', 'T1563.001', 'T1556', 'T1552.004', 'T1003', 'T1556.003']
+3
+{'alert': 2, 'desc': 1, 'keywords': 3}
+{'timestamp': '2025-09-22T18:51:01.061+0000', 'rule': {'level': 3, 'description': 'PAM: Login session opened.', 'id': '5501', 'firedtimes': 1, 'mail': False, 'groups': ['pam', 'syslog', 'authentication_success'], 'pci_dss': ['10.2.5'], 'gpg13': ['7.8', '7.9'], 'gdpr': ['IV_32.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567061.11561209', 'full_log': 'Sep 22 18:51:00 videoserver sshd[17243]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)', 'predecoder': {'program_name': 'sshd', 'timestamp': 'Sep 22 18:51:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'pam', 'name': 'pam'}, 'data': {'dstuser': 'root(uid=0)', 'uid': '0'}, 'location': 'journald'}
+['T1078']
+The alert indicates a successful SSH login session opened for the root user on the host videoserver. This behavior relates to authentication and session management, which can be mapped to techniques involving the use of valid accounts for remote access.
+['T1021.004', 'T1563.001', 'T1098.004', 'T1563', 'T1021', 'T1204', 'T1056.003', 'T1556', 'T1621', 'T1046']
+Valid Accounts, SSH, Remote System Services
+['T1021', 'T1021.004', 'T1110.004', 'T1078.004', 'T1136', 'T1136.003', 'T1133', 'T1078', 'T1078.001', 'T1098.001']
+PAM: Login session opened.
+['T1556.003', 'T1547.007', 'T1037.002', 'T1547.015', 'T1550.004', 'T1556', 'T1003.008', 'T1003', 'T1539', 'T1021.004']
+4
+{'alert': 2, 'desc': 1, 'keywords': 4}
+{'timestamp': '2025-09-22T18:51:02.101+0000', 'rule': {'level': 3, 'description': 'Wazuh agent stopped.', 'id': '506', 'firedtimes': 3, 'mail': False, 'groups': ['ossec'], 'pci_dss': ['10.6.1', '10.2.6'], 'gpg13': ['10.1'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.6', 'AU.14', 'AU.5'], 'tsc': ['CC7.2', 'CC7.3', 'CC6.8']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567062.11562798', 'full_log': "ossec: Agent stopped: 'videoserver->any'.", 'decoder': {'parent': 'ossec', 'name': 'ossec'}, 'data': {'extra_data': 'videoserver->any'}, 'location': 'wazuh-remoted'}
+['T1562.001']
+The Wazuh security agent on the host 'videoserver' has stopped, which may indicate an attempt to disable security monitoring or evade detection.
+['T1564.011', 'T1553.005', 'T1125', 'T1653', 'T1556.006', 'T1685.003', 'T1546', 'T1668', 'T1189', 'T1219.003']
+Impair Defenses, Indicator Removal on Host
+['T1027.005', 'T1564.006', 'T1685.003', 'T1498.002', 'T1497.002', 'T1685', 'T1564', 'T1568', 'T1673', 'T1211']
+Wazuh agent stopped.
+['T1564.011', 'T1529', 'T1499.004', 'T1556.006', 'T1547.007', 'T1489', 'T1668', 'T1543.001', 'T1546.005', 'T1543.005']
+5
+{'alert': 2, 'desc': 1, 'keywords': 4}
+{'timestamp': '2025-09-22T18:53:22.278+0000', 'rule': {'level': 4, 'description': 'First time user executed sudo.', 'id': '5403', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567202.11567373', 'full_log': 'Sep 22 18:53:21 videoserver sudo:     root : PWD=/usr/share/zoneminder/www ; USER=www-data ; COMMAND=/usr/bin/true', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:53:21', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'root', 'dstuser': 'www-data', 'pwd': '/usr/share/zoneminder/www', 'command': '/usr/bin/true'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+The alert indicates that the root user executed a command as the www-data user via sudo for the first time on the system. This behavior involves privilege management and potential lateral movement or user context switching within the system.
+['T1548.003', 'T1204', 'T1548.004', 'T1189', 'T1548.001', 'T1033', 'T1553.004', 'T1546', 'T1543.004', 'T1548']
+sudo, privilege escalation, abuse of privilege
+['T1548.003', 'T1068', 'T1548', 'T1098', 'T1548.004', 'T1548.001', 'T1648', 'T1546', 'T1548.002', 'T1546.016']
+First time user executed sudo.
+['T1548.003', 'T1548.004', 'T1548.001', 'T1033', 'T1037.005', 'T1546.016', 'T1548', 'T1037', 'T1564.002', 'T1003.008']
+6
+{'alert': 3, 'desc': 2, 'keywords': 5}
+{'timestamp': '2025-09-22T18:53:22.295+0000', 'rule': {'level': 3, 'description': 'Successful sudo executed.', 'id': '5407', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo'], 'pci_dss': ['10.2.5', '10.2.2'], 'gpg13': ['7.6', '7.8', '7.13'], 'gdpr': ['IV_32.2'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567202.11568557', 'full_log': 'Sep 22 18:53:21 videoserver sudo:     root : PWD=/usr/share/zoneminder/www ; USER=www-data ; COMMAND=/usr/bin/zmdc.pl check', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:53:21', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'root', 'dstuser': 'www-data', 'pwd': '/usr/share/zoneminder/www', 'command': '/usr/bin/zmdc.pl check'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+The alert indicates a successful sudo execution where the root user executed the command /usr/bin/zmdc.pl check as the www-data user. This involves potential privilege escalation or administrative activity within the ZoneMinder application environment.
+['T1559.003', 'T1003.007', 'T1007', 'T1548.003', 'T1548.004', 'T1548.006', 'T1069.001', 'T1518.001', 'T1134.004', 'T1518.002']
+sudo, privilege escalation, zmdc.pl
+['T1548', 'T1548.003', 'T1548.004', 'T1548.002', 'T1559.003', 'T1222', 'T1548.001', 'T1531', 'T1068', 'T1003.007']
+Successful sudo executed.
+['T1548.003', 'T1548.004', 'T1548.001', 'T1546.016', 'T1069.001', 'T1037.002', 'T1569.001', 'T1548', 'T1569', 'T1548.006']
+7
+{'alert': 4, 'desc': 3, 'keywords': 6}
+{'timestamp': '2025-09-22T18:56:02.451+0000', 'rule': {'level': 8, 'description': 'New user added to the system.', 'id': '5902', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'adduser'], 'pci_dss': ['10.2.7', '10.2.5', '8.1.2'], 'gpg13': ['4.13'], 'gdpr': ['IV_35.7.d', 'IV_32.2'], 'hipaa': ['164.312.b', '164.312.a.2.I', '164.312.a.2.II'], 'nist_800_53': ['AU.14', 'AC.7', 'AC.2', 'IA.4'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567362.11591429', 'full_log': 'Sep 22 18:56:00 videoserver useradd[1658]: new user: name=webadmin, UID=1003, GID=1003, home=/home/webadmin, shell=/bin/bash, from=none', 'predecoder': {'program_name': 'useradd', 'timestamp': 'Sep 22 18:56:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'useradd', 'name': 'useradd'}, 'data': {'dstuser': 'webadmin', 'uid': '1003', 'gid': '1003', 'home': '/home/webadmin', 'shell': '/bin/bash,'}, 'location': '/var/log/auth.log'}
+['T1136']
+The system detected the creation of a new local user account named webadmin using the useradd command on the host videoserver.
+['T1136.002', 'T1136.001', 'T1125', 'T1087.001', 'T1078.001', 'T1136', 'T1098.007', 'T1078.003', 'T1033', 'T1136.003']
+Create Account, Local Account
+['T1078.003', 'T1136.001', 'T1087.001', 'T1136.002', 'T1136', 'T1585', 'T1098.007', 'T1585.002', 'T1037.003', 'T1136.003']
+New user added to the system.
+['T1033', 'T1564.002', 'T1136.001', 'T1531', 'T1134.003', 'T1087.001', 'T1136.002', 'T1098.007', 'T1136', 'T1036.010']
+8
+{'alert': 5, 'desc': 4, 'keywords': 7}
+{'timestamp': '2025-09-22T18:59:02.613+0000', 'rule': {'level': 3, 'description': 'Successful sudo to ROOT executed.', 'id': '5402', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'sudo'], 'pci_dss': ['10.2.5', '10.2.2'], 'gpg13': ['7.6', '7.8', '7.13'], 'gdpr': ['IV_32.2'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7', 'AC.6'], 'tsc': ['CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758567542.11599707', 'full_log': 'Sep 22 18:59:00 videoserver sudo: webadmin : PWD=/home/webadmin ; USER=root ; COMMAND=/usr/bin/lspci', 'predecoder': {'program_name': 'sudo', 'timestamp': 'Sep 22 18:59:00', 'hostname': 'videoserver'}, 'decoder': {'parent': 'sudo', 'name': 'sudo', 'ftscomment': 'First time user executed the sudo command'}, 'data': {'srcuser': 'webadmin', 'dstuser': 'root', 'pwd': '/home/webadmin', 'command': '/usr/bin/lspci'}, 'location': '/var/log/auth.log'}
+['T1548.003']
+The user webadmin successfully executed the command /usr/bin/lspci with root privileges via sudo. This activity involves privilege escalation and system information discovery.
+['T1548.003', 'T1548.001', 'T1003.001', 'T1069.002', 'T1087.001', 'T1087.002', 'T1069.001', 'T1548.004', 'T1033', 'T1136.001']
+sudo, privilege escalation, lspci
+['T1548.003', 'T1548.001', 'T1548', 'T1068', 'T1548.004', 'T1098', 'T1222.002', 'T1548.002', 'T1222', 'T1531']
+Successful sudo to ROOT executed.
+['T1548.003', 'T1548.001', 'T1548.004', 'T1546.016', 'T1546.017', 'T1563.001', 'T1037.002', 'T1037.004', 'T1069.001', 'T1068']
+9
+{'alert': 6, 'desc': 5, 'keywords': 8}
+{'timestamp': '2025-09-22T18:30:36.127+0000', 'rule': {'level': 10, 'description': 'Multiple web server 400 error codes from same source ip.', 'id': '31151', 'frequency': 14, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'web_scan', 'recon'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565836.1693570', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.bas:ShowVolume HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.AP HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.link HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.blt HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.iso-ru HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.xtp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.de HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.10:100 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.nl HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.cfc HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"\n192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.htpasswd HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.sql HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/borLjZ2z.sql'}, 'location': '/var/www/default/log/access.log'}
+['T1595.002']
+The alert indicates that a source IP address (192.42.1.174) is performing a high volume of web requests resulting in 404 errors. The user-agent string identifies the tool as Nikto/2.1.5, which is a well-known web server scanner used for reconnaissance and identifying potential vulnerabilities.
+['T1036.012', 'T1016.001', 'T1596.005', 'T1595.001', 'T1189', 'T1518.001', 'T1595.002', 'T1557.004', 'T1583.006', 'T1056.003']
+Nikto, web scanning, reconnaissance, vulnerability scanning
+['T1595.002', 'T1595', 'T1596.005', 'T1595.001', 'T1592.004', 'T1590', 'T1595.003', 'T1210', 'T1592.003', 'T1590.006']
+Multiple web server 400 error codes from same source ip.
+['T1505.004', 'T1499.003', 'T1071.001', 'T1036.012', 'T1210', 'T1498', 'T1499', 'T1499.002', 'T1614', 'T1016.001']
+10
+{'alert': 6, 'desc': 6, 'keywords': 9}
+{'timestamp': '2025-09-22T18:30:36.260+0000', 'rule': {'level': 6, 'description': 'Suspicious URL access.', 'id': '31516', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'appsec', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565836.1733772', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:36 +0000] "GET /borLjZ2z.bak HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:map_codes)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/borLjZ2z.bak'}, 'location': '/var/www/default/log/access.log'}
+['T1055']
+The alert indicates that an external IP address performed a web request using the Nikto vulnerability scanner (version 2.1.5) against the server, attempting to access a non-existent backup file (.bak). This behavior is consistent with automated reconnaissance and vulnerability scanning.
+['T1016.001', 'T1210', 'T1557.004', 'T1614', 'T1046', 'T1595.002', 'T1190', 'T1596.005', 'T1595.001', 'T1518.001']
+Nikto vulnerability scanner, web application scanning, reconnaissance
+['T1595.002', 'T1595', 'T1596.005', 'T1595.001', 'T1210', 'T1203', 'T1592.004', 'T1518', 'T1518.001', 'T1602']
+Suspicious URL access.
+['T1598.003', 'T1204', 'T1189', 'T1204.001', 'T1036.012', 'T1566.002', 'T1176', 'T1584.006', 'T1608.005', 'T1016.001']
+11
+{'alert': 6, 'desc': 6, 'keywords': 9}
+{'timestamp': '2025-09-22T18:30:42.254+0000', 'rule': {'level': 6, 'description': 'Common web attack.', 'id': '31104', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.1'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565842.1908930', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000063)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00'}, 'location': '/var/www/default/log/access.log'}
+['T1055', 'T1083', 'T1190']
+The alert indicates a web application scanning attempt using the Nikto tool, specifically targeting a CGI script with a path traversal payload attempting to access /etc/passwd.
+['T1189', 'T1204', 'T1204.004', 'T1176', 'T1598.003', 'T1033', 'T1203', 'T1036.002', 'T1056.003', 'T1003.008']
+Path Traversal, Web Application Scanning, Nikto
+['T1083', 'T1574.007', 'T1595', 'T1005', 'T1595.003', 'T1595.002', 'T1574.004', 'T1203', 'T1518.002', 'T1596.005']
+Common web attack.
+['T1584.006', 'T1102.003', 'T1102.002', 'T1583.006', 'T1204', 'T1071.001', 'T1598.003', 'T1189', 'T1499.002', 'T1036.012']
+14
+{'alert': 6, 'desc': 6, 'keywords': 10}
+{'timestamp': '2025-09-22T18:30:44.272+0000', 'rule': {'level': 10, 'description': 'Multiple common web attacks from same source ip.', 'id': '31153', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2307162', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /cgi-bin/cmd.exe?/c+dir HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000348)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/remind.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000317)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/auoconfig.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000316)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /_mem_bin/auoconfig.asp HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000315)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /cgi-bin/%2e%2e/abyss.conf HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000260)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /newuser?Image=../../database/rbsserv.mdb HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000246)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /web-console/ServerInfo.jsp%00 HTTP/1.1" 404 395 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000165)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /scripts/root.exe?/c+dir+c:\\\\+/OG HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000153)"\n192.42.1.174 - - [22/Sep/2025:18:30:41 +0000] "GET /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi?data_dir=\\\\etc\\\\passwd%00 HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000063)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /%00/ HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000457)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/%00/'}, 'location': '/var/www/default/log/access.log'}
+['T1055', 'T1083']
+The alert indicates a source IP performing automated vulnerability scanning using the Nikto tool. The logs show multiple attempts to access sensitive files and directories, including path traversal attempts (e.g., ../../), execution of system commands via CGI scripts (e.g., cmd.exe, root.exe), and attempts to access configuration or database files.
+['T1518.001', 'T1189', 'T1039', 'T1016.001', 'T1204', 'T1681', 'T1176.002', 'T1685.006', 'T1574.007', 'T1211']
+Vulnerability Scanning, Web Application Attack, Path Traversal, Directory Traversal
+['T1203', 'T1083', 'T1595.003', 'T1574.007', 'T1608.004', 'T1595.002', 'T1039', 'T1210', 'T1204', 'T1222']
+Multiple common web attacks from same source ip.
+['T1071.001', 'T1499.002', 'T1498.002', 'T1102.002', 'T1036.012', 'T1102.003', 'T1584.006', 'T1498', 'T1583.006', 'T1665']
+16
+{'alert': 6, 'desc': 6, 'keywords': 11}
+{'timestamp': '2025-09-22T18:30:44.772+0000', 'rule': {'level': 6, 'description': 'XSS (Cross Site Scripting) attempt.', 'id': '31105', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.7'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2499993', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000702)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script>'}, 'location': '/var/www/default/log/access.log'}
+['T1059.007']
+The alert indicates an attempt to perform a Cross-Site Scripting (XSS) attack by injecting a script tag into the 'sitename' parameter of the 'mambosimple.php' file, likely originating from a vulnerability scanner (Nikto).
+['T1189', 'T1598.003', 'T1176', 'T1204', 'T1137.004', 'T1204.004', 'T1036', 'T1027.017', 'T1027.018', 'T1218.005']
+Cross-Site Scripting, XSS, Web Application Attack
+['T1189', 'T1027.017', 'T1204.004', 'T1203', 'T1218.005', 'T1220', 'T1204', 'T1505.003', 'T1059.007', 'T1218.001']
+XSS (Cross Site Scripting) attempt.
+['T1027.017', 'T1059.007', 'T1220', 'T1027.006', 'T1189', 'T1204.004', 'T1505.003', 'T1027.018', 'T1036.002', 'T1218.005']
+17
+{'alert': 7, 'desc': 6, 'keywords': 12}
+{'timestamp': '2025-09-22T18:30:44.791+0000', 'rule': {'level': 10, 'description': 'Multiple XSS (Cross Site Scripting) attempts from same source ip.', 'id': '31154', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4', '6.5.7'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565844.2505265', 'previous_output': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/uploadimage.php?directory=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000710)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/view.php?path=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000709)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/popups/sectionswindow.php?type=web&link=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000708)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/upload.php?newbanner=1&choice=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000707)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailarticle.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000706)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailfaq.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000705)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /emailfriend/emailnews.php?id=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000704)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /index.php?option=search&searchword=<script>alert(document.cookie);</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000703)"\n192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /themes/mambosimple.php?detection=detected&sitename=</title><script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000702)"', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:42 +0000] "GET /administrator/gallery/navigation.php?directory=\\\\\\"<script>alert(document.cookie)</script> HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:000711)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/administrator/gallery/navigation.php?directory=\\\\\\"<script>alert(document.cookie)</script>'}, 'location': '/var/www/default/log/access.log'}
+['T1059']
+The alert indicates an external source (192.42.1.174) performing automated web application vulnerability scanning using the Nikto tool. The logs show multiple HTTP GET requests containing XSS payloads (script tags) targeting various PHP files on the web server to test for injection vulnerabilities.
+['T1189', 'T1595.002', 'T1518.001', 'T1203', 'T1016.001', 'T1204', 'T1681', 'T1176', 'T1596.005', 'T1046']
+Cross-Site Scripting, XSS, Web Application Scanning, Nikto
+['T1059.007', 'T1505.003', 'T1027.017', 'T1218.005', 'T1189', 'T1059', 'T1203', 'T1204.004', 'T1220', 'T1218.001']
+Multiple XSS (Cross Site Scripting) attempts from same source ip.
+['T1027.017', 'T1598.003', 'T1189', 'T1204', 'T1204.004', 'T1036.012', 'T1102.003', 'T1102.002', 'T1071.001', 'T1665']
+18
+{'alert': 7, 'desc': 6, 'keywords': 13}
+{'timestamp': '2025-09-22T18:30:45.734+0000', 'rule': {'level': 10, 'description': 'Apache: Multiple Invalid URI requests from same source.', 'id': '30316', 'frequency': 10, 'firedtimes': 1, 'mail': False, 'groups': ['apache', 'web', 'invalid_request'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.14', 'AC.7', 'SI.4'], 'pci_dss': ['10.2.4', '11.4'], 'tsc': ['CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565845.2553188', 'previous_output': "[Mon Sep 22 18:30:42.672703 2025] [core:error] [pid 661] [client 192.42.1.174:33238] AH00126: Invalid URI in request 'etc/passwd' 'GET /%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.670697 2025] [core:error] [pid 660] [client 192.42.1.174:33236] AH00126: Invalid URI in request 'windows/win.ini' 'GET /%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/windows/win.ini HTTP/1.1'\n[Mon Sep 22 18:30:42.663635 2025] [core:error] [pid 671] [client 192.42.1.174:33232] AH00126: Invalid URI in request 'etc/passwd' 'GET /../../../../../../../../../../etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.636310 2025] [core:error] [pid 672] [client 192.42.1.174:33224] AH00126: Invalid URI in request 'etc/passwd' 'GET /cgi-bin/ssi//%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.524137 2025] [core:error] [pid 2851] [client 192.42.1.174:33210] AH00126: Invalid URI in request 'etc/passwd' 'GET /DomainFiles/*//../../../../../../../../../../etc/passwd HTTP/1.1'\n[Mon Sep 22 18:30:42.514849 2025] [core:error] [pid 673] [client 192.42.1.174:33202] AH00126: Invalid URI in request '.../boot.ini' 'GET ////./../.../boot.ini HTTP/1.1'\n[Mon Sep 22 18:30:42.510160 2025] [core:error] [pid 661] [client 192.42.1.174:33186] AH00126: Invalid URI in request 'winnt/repair/sam._' 'GET /../../../../winnt/repair/sam._ HTTP/1.1'\n[Mon Sep 22 18:30:42.508486 2025] [core:error] [pid 660] [client 192.42.1.174:33182] AH00126: Invalid URI in request 'boot.ini' 'GET /../../../../../../../../../boot.ini HTTP/1.1'\n[Mon Sep 22 18:30:36.522498 2025] [core:error] [pid 673] [client 192.42.1.174:46936] AH00126: Invalid URI in request '' 'GET . HTTP/1.0'", 'full_log': "[Mon Sep 22 18:30:43.416940 2025] [core:error] [pid 660] [client 192.42.1.174:33410] AH00126: Invalid URI in request 'etc/' 'GET /file/../../../../../../../../etc/ HTTP/1.1'", 'decoder': {'parent': 'apache-errorlog', 'name': 'apache-errorlog'}, 'data': {'srcip': '192.42.1.174', 'srcport': '33410', 'id': 'AH00126'}, 'location': '/var/www/default/log/error.log'}
+['T1499']
+The alert shows multiple HTTP GET requests containing directory traversal sequences (e.g., ../, %2e%2e/) attempting to access sensitive system files such as /etc/passwd, boot.ini, and win.ini. This indicates an active attempt to perform path traversal attacks against the web server.
+['T1204', 'T1189', 'T1574.007', 'T1203', 'T1204.001', 'T1036.012', 'T1218.005', 'T1598.003', 'T1505.004', 'T1204.004']
+Path Traversal, Directory Traversal, Web Application Attack
+['T1203', 'T1574.007', 'T1204', 'T1574.009', 'T1608.004', 'T1204.001', 'T1189', 'T1222', 'T1574.008', 'T1083']
+Apache: Multiple Invalid URI requests from same source.
+['T1598.003', 'T1036.012', 'T1498.002', 'T1204', 'T1070.010', 'T1204.001', 'T1027.012', 'T1584.008', 'T1574.008', 'T1499.003']
+19
+{'alert': 7, 'desc': 6, 'keywords': 13}
+{'timestamp': '2025-09-22T18:30:49.360+0000', 'rule': {'level': 5, 'description': 'Apache: Attempt to access forbidden directory index.', 'id': '30306', 'firedtimes': 1, 'mail': False, 'groups': ['apache', 'web', 'access_denied'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['SA.11', 'AU.14', 'AC.7'], 'pci_dss': ['6.5.8', '10.2.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565849.4398946', 'full_log': '[Mon Sep 22 18:30:44.603660 2025] [autoindex:error] [pid 661] [client 192.42.1.174:33500] AH01276: Cannot serve directory /var/www/default/log/: No matching DirectoryIndex (index.html,index.cgi,index.pl,index.php,index.xhtml,index.htm) found, and server-generated directory index forbidden by Options directive', 'decoder': {'parent': 'apache-errorlog', 'name': 'apache-errorlog'}, 'data': {'srcip': '192.42.1.174', 'srcport': '33500', 'id': 'AH01276'}, 'location': '/var/www/default/log/error.log'}
+['T1190']
+The alert indicates an attempt to access a directory on an Apache web server where directory indexing is disabled, which is a common reconnaissance technique used by attackers to discover files and directory structures.
+['T1189', 'T1204', 'T1204.001', 'T1564.012', 'T1222', 'T1080', 'T1036', 'T1039', 'T1564.013', 'T1564.001']
+Directory Listing, Reconnaissance, Discovery
+['T1083', 'T1595.003', 'T1039', 'T1596.005', 'T1590', 'T1591', 'T1597.001', 'T1119', 'T1596', 'T1595']
+Apache: Attempt to access forbidden directory index.
+['T1222', 'T1189', 'T1222.002', 'T1564.001', 'T1574.008', 'T1595.003', 'T1204', 'T1222.001', 'T1083', 'T1069.002']
+20
+{'alert': 7, 'desc': 6, 'keywords': 13}
+{'timestamp': '2025-09-22T18:30:50.167+0000', 'rule': {'level': 7, 'description': 'SQL injection attempt.', 'id': '31103', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack', 'sql_injection'], 'pci_dss': ['6.5', '11.4', '6.5.1'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565850.4557382', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:45 +0000] "GET /xsql/demo/adhocsql/query.xsql?sql=select%20username%20from%20ALL_USERS HTTP/1.1" 404 396 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:002811)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '404', 'url': '/xsql/demo/adhocsql/query.xsql?sql=select%20username%20from%20ALL_USERS'}, 'location': '/var/www/default/log/access.log'}
+['T1190']
+An external IP address performed a SQL injection attempt against a web server using a GET request with a malicious SQL query string. The request was identified as originating from the Nikto vulnerability scanner (version 2.1.5).
+['T1056.003', 'T1210', 'T1218.008', 'T1190', 'T1590.005', 'T1596.005', 'T1055.004', 'T1055', 'T1499', 'T1040']
+SQL injection, Nikto scanner
+['T1505.001', 'T1055', 'T1055.004', 'T1218.008', 'T1602.001', 'T1001.001', 'T1546.011', 'T1622', 'T1055.002', 'T1055.008']
+SQL injection attempt.
+['T1204.004', 'T1598.003', 'T1055.004', 'T1218.008', 'T1505.001', 'T1055', 'T1204', 'T1598.002', 'T1056.003', 'T1110.003']
+21
+{'alert': 7, 'desc': 7, 'keywords': 13}
+{'timestamp': '2025-09-22T18:30:57.827+0000', 'rule': {'level': 6, 'description': 'PHP CGI-bin vulnerability attempt.', 'id': '31110', 'firedtimes': 1, 'mail': False, 'groups': ['web', 'accesslog', 'attack'], 'pci_dss': ['6.5', '11.4'], 'gdpr': ['IV_35.7.d'], 'nist_800_53': ['SA.11', 'SI.4'], 'tsc': ['CC6.6', 'CC7.1', 'CC8.1', 'CC6.1', 'CC6.8', 'CC7.2', 'CC7.3']}, 'agent': {'id': '002', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1758565857.7405014', 'full_log': '192.42.1.174 - - [22/Sep/2025:18:30:50 +0000] "GET /?-s HTTP/1.1" 302 459 "-" "Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:006523)"', 'decoder': {'name': 'web-accesslog'}, 'data': {'protocol': 'GET', 'srcip': '192.42.1.174', 'id': '302', 'url': '/?-s'}, 'location': '/var/www/default/log/access.log'}
+['T1210']
+The alert indicates an external source using the Nikto vulnerability scanner to perform reconnaissance against a web server, specifically targeting PHP CGI-bin configurations.
+['T1189', 'T1176', 'T1518.001', 'T1595.002', 'T1218.001', 'T1176.002', 'T1203', 'T1027.004', 'T1027.018', 'T1016.001']
+Vulnerability scanning, Nikto, Web application reconnaissance
+['T1595.002', 'T1596.005', 'T1595', 'T1203', 'T1210', 'T1595.001', 'T1592.004', 'T1595.003', 'T1588.006', 'T1518.001']
+PHP CGI-bin vulnerability attempt.
+['T1218.001', 'T1203', 'T1027.010', 'T1027.006', 'T1027.018', 'T1027.004', 'T1036.002', 'T1204.004', 'T1189', 'T1027.017']
+22
+{'alert': 7, 'desc': 7, 'keywords': 14}
+{'timestamp': '2025-10-14T11:07:16.201+0000', 'rule': {'level': 6, 'description': 'Executed recursive query of all files using ls command.', 'id': '92605', 'firedtimes': 1, 'mail': False, 'groups': ['audit_detections']}, 'agent': {'id': '001', 'name': 'videoserver', 'ip': '172.17.100.121'}, 'manager': {'name': 'wazuh'}, 'id': '1760440036.10131265', 'full_log': 'type=SYSCALL msg=audit(1760440025.642:12360): arch=c000003e syscall=59 success=yes exit=0 a0=7ffea67a8cf0 a1=55921f4b81e0 a2=7ffea67a92b0 a3=7f5bbb0ca800 items=3 ppid=16912 pid=16921 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm="ls" exe="/usr/bin/ls" subj==unconfined key="T1166_Seuid_and_Setgid"\x1dARCH=x86_64 SYSCALL=execve AUID="unset" UID="www-data" GID="www-data" EUID="www-data" SUID="www-data" FSUID="www-data" EGID="www-data" SGID="www-data" FSGID="www-data" type=EXECVE msg=audit(1760440025.642:12360): argc=3 a0="ls" a1="-l" a2="/etc/.java/.systemPrefs/.systemRootModFile" type=PATH msg=audit(1760440025.642:12360): item=0 name="/usr/bin/ls" inode=827 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1760440025.642:12360): item=1 name="/usr/bin/ls" inode=827 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PATH msg=audit(1760440025.642:12360): item=2 name="/lib64/ld-linux-x86-64.so.2" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\x1dOUID="root" OGID="root" type=PROCTITLE msg=audit(1760440025.642:12360): proctitle=66696E64002F002D747970650066002D696E616D65002E2A0021002D70617468002F7379732F2A0021002D70617468002F53797374656D2F2A0021002D70617468002F707269766174652F7661722F2A002D65786563006C73002D6C007B7D003B', 'decoder': {'parent': 'auditd', 'name': 'auditd'}, 'data': {'audit': {'type': 'SYSCALL', 'id': '12360', 'arch': 'c000003e', 'syscall': '59', 'success': 'yes', 'exit': '0', 'ppid': '16912', 'pid': '16921', 'auid': '4294967295', 'uid': '33', 'gid': '33', 'euid': '33', 'suid': '33', 'fsuid': '33', 'egid': '33', 'sgid': '33', 'fsgid': '33', 'tty': 'pts0', 'session': '4294967295', 'command': 'ls', 'exe': '/usr/bin/ls', 'key': 'T1166_Seuid_and_Setgid', 'execve': {'a0': 'ls', 'a1': '-l', 'a2': '/etc/.java/.systemPrefs/.systemRootModFile'}, 'file': {'name': '/usr/bin/ls', 'inode': '827', 'mode': '0100755'}}}, 'location': '/var/log/audit/audit.log'}
+['T1083']
+The alert indicates that the user 'www-data' executed a command sequence involving 'find' and 'ls' to recursively query files in sensitive directories such as /sys, /System, and /private/var. This behavior is indicative of reconnaissance or discovery activities often performed by an attacker to map the file system or identify sensitive configuration files.
+['T1204', 'T1564.013', 'T1039', 'T1189', 'T1564.001', 'T1518.001', 'T1203', 'T1036', 'T1518.002', 'T1204.001']
+System Information Discovery, File and Directory Discovery, T1083, T1068
+['T1083', 'T1005', 'T1135', 'T1082', 'T1039', 'T1518.002', 'T1025', 'T1564.004', 'T1680', 'T1120']
+Executed recursive query of all files using ls command.
+['T1083', 'T1025', 'T1070.004', 'T1005', 'T1003.001', 'T1679', 'T1039', 'T1685.006', 'T1564.013', 'T1518.002']
+23
+{'alert': 8, 'desc': 7, 'keywords': 15}
+{'timestamp': '2025-12-15T11:10:46.939+0000', 'rule': {'level': 8, 'description': 'Interface entered in promiscuous(sniffing) mode.', 'id': '5104', 'firedtimes': 1, 'mail': False, 'groups': ['syslog', 'linuxkernel', 'promisc'], 'pci_dss': ['10.6.1', '11.4'], 'gpg13': ['4.13'], 'gdpr': ['IV_35.7.d'], 'hipaa': ['164.312.b'], 'nist_800_53': ['AU.6', 'SI.4'], 'tsc': ['CC7.2', 'CC7.3', 'CC6.1', 'CC6.8']}, 'agent': {'id': '001', 'name': 'inetfw', 'ip': '192.168.100.254'}, 'manager': {'name': 'wazuh'}, 'id': '1765797046.991278', 'full_log': 'Dec 15 11:10:45 inetfw kernel: [ 1638.994908] device ens3 entered promiscuous mode', 'predecoder': {'program_name': 'kernel', 'timestamp': 'Dec 15 11:10:45', 'hostname': 'inetfw'}, 'decoder': {'name': 'kernel'}, 'location': '/var/log/kern.log'}
+['T1040']
+The network interface ens3 on host inetfw has entered promiscuous mode, which allows the device to capture all network traffic passing through the interface. This behavior is often associated with network reconnaissance, sniffing, or man-in-the-middle attacks.
+['T1040', 'T1016.001', 'T1018', 'T1090.001', 'T1011', 'T1095', 'T1071.001', 'T1599', 'T1048', 'T1602.002']
+network sniffing, promiscuous mode, packet capture
+['T1040', 'T1071.002', 'T1071.001', 'T1016.001', 'T1205.001', 'T1205.002', 'T1095', 'T1071', 'T1071.003', 'T1030']
+Interface entered in promiscuous(sniffing) mode.
+['T1040', 'T1095', 'T1205.001', 'T1205.002', 'T1056', 'T1546.005', 'T1071', 'T1016.001', 'T1205', 'T1055']
+24
+{'alert': 9, 'desc': 8, 'keywords': 16}

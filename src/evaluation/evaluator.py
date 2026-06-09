@@ -1,7 +1,8 @@
 import uuid
 import json
 from datetime import datetime
-from models import AlertLog, EvaluationResult # Tus Pydantic models
+from src.models.models import AlertLog, EvaluationResult 
+import time
 
 class EvaluationRunner:
     def __init__(self, agent, data_saver, config: dict):
@@ -22,27 +23,32 @@ class EvaluationRunner:
         aciertos_mitre = 0
         
         for index, row in dataset_df.iterrows():
-            alert_data = json.loads(row['alert_data']) 
+            alert_data = json.loads(row['alert']) 
             
             # 1. EJECUTAR AGENTE
-            final_state, telemetry = self.agent.process_alert(alert_data)
-            
+            try:
+                final_state, telemetry = self.agent.process_alert(alert_data)
+            except:
+                print('Esperando al modelo...')
+                time.sleep(70)
+                final_state, telemetry = self.agent.process_alert(alert_data)
+
             # 2. EXTRAER RESULTADOS
             val_report = final_state.get('validation_report')
             predicted_ttps = [e.item_id for e in val_report.mitre_evaluations if e.decision] if val_report else []
             predicted_cves = [e.item_id for e in val_report.cve_evaluations if e.decision] if val_report else []
             
-            real_ttps = alert_data.get('real_ttps', [])
+            real_ttps = eval(row['real_ttps'])
             real_cves = alert_data.get('real_cves', [])
             
-            # (Opcional) Guardar informe físico y coger la ruta
-            report_path = f"reports/report_{alert_data.get('id', index)}.md"
+            # Guardar informe físico y coger la ruta
+            report_path = f"reports/report_{row['alert_id']}.md" if self.config.generate_report else None
             
             # 3. CREAR LOG DE ALERTA
             alert_log = AlertLog(
-                alert_id=str(alert_data.get('id', index)),
-                alert_timestamp=datetime.now(), # Cambia esto por alert_data['timestamp'] parseado
-                alert_description=alert_data.get('description', 'No description'),
+                alert_id=str(row['alert_id']),
+                alert_timestamp=row['timestamp'], 
+                alert_description=row['description'],
                 predicted_ttps=predicted_ttps,
                 predicted_cves=predicted_cves,
                 real_ttps=real_ttps,
@@ -51,7 +57,6 @@ class EvaluationRunner:
                 execution_time=telemetry["execution_time"],
                 token_usage=telemetry["token_usage"],
                 llm_calls=telemetry["llm_calls"],
-                # Truco: Convertir el dict a string JSON para que CSVDataSaver no explote
                 node_breakdown=json.dumps(telemetry["node_breakdown"]) 
             )
             
@@ -61,12 +66,21 @@ class EvaluationRunner:
             # Actualizamos contadores globales
             total_alerts += 1
             total_time += telemetry["execution_time"]
-            total_tokens += telemetry["token_usage"]
+            total_tokens += telemetry["token_usage"]["total_tokens"]
             total_llm_calls += telemetry["llm_calls"]
             
             # Lógica básica de acierto (Si descubrió al menos un TTP real)
             if any(ttp in real_ttps for ttp in predicted_ttps):
                 aciertos_mitre += 1
+            
+            else: 
+                real_parents = [r_ttp.split('.')[0] for r_ttp in real_ttps]
+                predicted_parents = [p_ttp.split('.')[0] for p_ttp in predicted_ttps]
+
+                if any(ttp in real_parents for ttp in predicted_parents):
+                    aciertos_mitre += 1
+
+                    
 
         # 4. CREAR RESULTADO GLOBAL
         avg_time = total_time / total_alerts if total_alerts > 0 else 0
@@ -76,7 +90,8 @@ class EvaluationRunner:
             evaluation_id=self.evaluation_id,
             dataset_name=dataset_name,
             agent_config=self.config,
-            agent_components={"llm": "tu_llm", "embedder": "tu_embedder"},
+            # agent_components={"llm": self.agent.llm.__class__.__name.__, 
+            #                   "embedder": self.agent.embedder.__class__.__name.__},
             alerts_evaluated=total_alerts,
             mitre_accuracy=mitre_acc,
             cve_accuracy=0.0, # Implementar tu lógica

@@ -41,35 +41,37 @@ class SOCAgent:
         self.tracker.reset()  # Reiniciamos el tracker para esta nueva alerta
         start_time = time.time()
 
-        for event in self.app.stream(inputs, stream_mode='updates'):
-            for node_name, node_state in event.items():
-                print(f'\nNODO: [{node_name}]')
+        # for event in self.app.stream(inputs, stream_mode='updates'):
+        #     for node_name, node_state in event.items():
+        #         print(f'\nNODO: [{node_name}]')
 
-                if 'classification' in node_state:
-                    print(f"Classification: {node_state['classification']}")
+        #         if 'classification' in node_state:
+        #             print(f"Classification: {node_state['classification']}")
 
-                if 'mitre_data' in node_state:
-                    print(f"MITRE Data: {node_state['mitre_data'][:200]}...")
+        #         if 'mitre_data' in node_state:
+        #             print(f"MITRE Data: {node_state['mitre_data'][:200]}...")
 
-                if 'cve_data' in node_state:
-                    print(f"CVE Data: {node_state['cve_data'][:200]}...")
+        #         if 'cve_data' in node_state:
+        #             print(f"CVE Data: {node_state['cve_data'][:200]}...")
 
-                if 'context_window' in node_state:
-                    print(f"Context Window: {node_state['context_window'][:2]}...")  # Print only the first 2 alerts for brevity
+        #         if 'context_window' in node_state:
+        #             print(f"Context Window: {node_state['context_window'][:2]}...")  # Print only the first 2 alerts for brevity
 
-                if 'validation_report' in node_state:
-                    print(f"Validation Report: {node_state['validation_report']}")
+        #         if 'validation_report' in node_state:
+        #             print(f"Validation Report: {node_state['validation_report']}")
 
-                if 'final_report' in node_state:
-                    print(f"Final Report: {node_state['final_report']}")
+        #         if 'final_report' in node_state:
+        #             print(f"Final Report: {node_state['final_report']}")
+        event = self.app.invoke(inputs)
 
         execution_time = time.time() - start_time
+
         telemetry = {
             "execution_time": round(execution_time, 2),
             "token_usage": {
-                "prompt_tokens": self.tracker.total_prompt_tokens,
-                "completion_tokens": self.tracker.total_completion_tokens,
-                "total_tokens": self.tracker.total_prompt_tokens + self.tracker.total_completion_tokens
+                "prompt_tokens": self.tracker.prompt_tokens,
+                "completion_tokens": self.tracker.completion_tokens,
+                "total_tokens": self.tracker.total_tokens
             },
             "llm_calls": self.tracker.llm_calls,
             "node_breakdown": self.tracker.node_metrics

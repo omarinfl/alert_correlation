@@ -32,11 +32,13 @@ def make_classification_node(llm, tracker):
         At the slightest suspicion of malicious behavior, you MUST set mitre_search to True, and if there is any mention of exploitable software, vulnerabilities or patches, you MUST set cve_search to True.
         '''
         structured_llm = llm.with_structured_output(AlertClasification)
-        classification = structured_llm.invoke([SystemMessage(content=prompt),
-                                                HumanMessage(content=f'The alert to analyze is: {state["original_alert"]}')],
-                                                callbacks=[tracker])
+        llm_with_tracker = structured_llm.with_config(callbacks=[tracker])
+        classification = llm_with_tracker.invoke([SystemMessage(content=prompt),
+                                                HumanMessage(content=f'The alert to analyze is: {state["original_alert"]}')])
         
         tracker.record_node_time('classification', time.time() - start_time)
+
+        print(classification)
         return {'classification': classification}
     return classification_node
 
@@ -54,7 +56,9 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
 
         query = state['classification'].mitre_description
         query_vector = embedder.embed_query(query)
-        results = mitre_store.search(query_vector, top_k=config.mitre_top_k)
+        results = mitre_store.search(query_vector, top_k=config.mitre_top_k, 
+                                    #  filter={'is_subtechnique': False}
+                                     )
 
         results_text = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
                         f"Name: {r['name']}\n"
@@ -122,6 +126,7 @@ def make_validation_node(llm, tracker):
     def validation_node(state: AgentState) -> AgentState:
         '''Node that validates the relevance of the retrieved MITRE and CVE information.'''
         
+        print('Evaluando respuestas recuperadas...')
         tracker.set_current_node('validation_node')
         start_time = time.time()
 
@@ -144,9 +149,15 @@ def make_validation_node(llm, tracker):
         - Provide a detailed explanation of why you assigned that score.
         - Make a final decision on whether this technique should be included in the final report or not (decision=True/False).
         '''
+        # prompt = f'''
+        # You are a SOC analyst. Your task is to evaluate the relevance of the retrieved MITRE techniques and CVE vulnerabilities from an automatic search system.
+        # You must evaluate if each result is actually relevant to the original alert or whether it is semantic noise (for example, a MITRE technique that shares some keywords with the alert but is not actually related to the attack described in the alert).
+        # You also have a context window with previous and subsequent alerts that can help you understand better the situation and the relevance of the retrieved information. Use it to determine if the retrieved MITRE techniques and CVE vulnerabilities are actually relevant or are noise.
+        # '''
 
         validator = llm.with_structured_output(ValidationReport)
-        validation_report = validator.invoke([HumanMessage(content=prompt)], callbacks=[tracker])
+        llm_with_tracker = validator.with_config(callbacks=[tracker])
+        validation_report = llm_with_tracker.invoke([HumanMessage(content=prompt)])
 
         tracker.record_node_time('validation_node', time.time() - start_time)
 
@@ -181,15 +192,23 @@ def make_final_report_node(config, llm, tracker):
         MITRE Information: {validated_mitre}
         CVE Information: {validated_cve}'''
 
-        response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=user_input)], callbacks=[tracker])
+        llm_with_tracker = llm.with_config(callbacks=[tracker])
+
+        response = llm_with_tracker.invoke([SystemMessage(content=prompt), HumanMessage(content=user_input)])
         alert_id = state['original_alert'].get('id', 'unknown_alert_id')
         # Escribir en un archivo de texto el informe final
         report_path = os.path.join(config.report_dir, f'final_report_{alert_id}.md')
         os.makedirs(config.report_dir, exist_ok=True)
-        with open(report_path, 'w') as f:
-            f.write(response.content[0]['text'])
+        
+        try:
+            report_text = response.content[0]['text'] # Formato Gemini
+        except:
+            report_text = response.content # Formato locales
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(report_text) 
+            
 
         tracker.record_node_time('final_report_node', time.time() - start_time)
-        
         return {'final_report': response.content[0]}
     return final_report_node

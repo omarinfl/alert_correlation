@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Annotated, TypedDict, List, Dict
+from src.agent.config import AgentConfig
 
 
 class AlertClasification(BaseModel):
@@ -49,20 +50,20 @@ class AlertLog(BaseModel):
     real_ttps: List[str]
     real_cves: List[str]
 
-    report_path: str
+    report_path: str | None = None
 
     execution_time: float
-    token_usage: int
+    token_usage: dict
     llm_calls: int
-    node_breakdown: dict
+    node_breakdown: str
 
 class EvaluationResult(BaseModel):
     evaluation_date: datetime = Field(default_factory=datetime.now)
     evaluation_id: str
 
     dataset_name: str
-    agent_config: dict
-    agent_components: dict
+    agent_config: AgentConfig
+    # agent_components: dict[str, str]
 
     alerts_evaluated: int
 

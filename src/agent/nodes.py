@@ -30,6 +30,7 @@ def make_classification_node(llm, tracker):
         - Alert: "Proxyshell exploitation (CVE-2021-34473) followed by webshell detected" mitre_search: True (Web Shell), cve_search: True (Proxyshell vulnerability)
         
         At the slightest suspicion of malicious behavior, you MUST set mitre_search to True, and if there is any mention of exploitable software, vulnerabilities or patches, you MUST set cve_search to True.
+        IMPORTANT for mitre_description: if the alert is a web scanner or scanning tool event, don't focus solely on its scanning activity; also describe its behavior and objectives.
         '''
         structured_llm = llm.with_structured_output(AlertClasification)
         llm_with_tracker = structured_llm.with_config(callbacks=[tracker])
@@ -53,9 +54,11 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
         
         tracker.set_current_node('mitre_search_node')
         start_time = time.time()
+        prefix = "Represent this sentence for searching relevant passages: " # Para bge (asimétrico)
 
-        query = state['classification'].mitre_description
-        query_vector = embedder.embed_query(query)
+        # query = state['classification'].mitre_description
+        query = state['classification'].mitre_keywords
+        query_vector = embedder.embed_query(prefix + query)
         results = mitre_store.search(query_vector, top_k=config.mitre_top_k, 
                                     #  filter={'is_subtechnique': False}
                                      )

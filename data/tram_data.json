@@ -452,23 +452,23 @@
         "label": "T1574.001"
     },
     {
-        "text": "the malware starts a function called bypassSMADAV",
+        "text": "the malware starts a function called bypassSMADAV",
         "label": "T1106"
     },
     {
-        "text": "with the API function IsWindowVisible.",
+        "text": "with the API function IsWindowVisible.",
         "label": "T1106"
     },
     {
-        "text": "by IsWindowVisible function",
+        "text": "by IsWindowVisible function",
         "label": "T1106"
     },
     {
-        "text": "calling the RegisterClass function prior to calling CreateWindow.",
+        "text": "calling the RegisterClass function prior to calling CreateWindow.",
         "label": "T1106"
     },
     {
-        "text": "Before a call to CreateWindowEx, you would usually first need to create a class by calling RegisterClass and then class CreateWindowEx.",
+        "text": "Before a call to CreateWindowEx, you would usually first need to create a class by calling RegisterClass and then class CreateWindowEx.",
         "label": "T1106"
     },
     {

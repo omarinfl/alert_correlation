@@ -37,6 +37,8 @@ class AgentState(TypedDict):
 
 from datetime import datetime
 class AlertLog(BaseModel):
+    evaluation_id: str
+
     analysis_date: datetime = Field(default_factory=datetime.now)
     alert_id: str
     alert_timestamp: datetime

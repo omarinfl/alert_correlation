@@ -96,3 +96,4 @@ class UniversalTokenTracker(BaseCallbackHandler):
         self.completion_tokens = 0
         self.total_tokens = 0
         self.llm_calls = 0
+        self.node_metrics = {} 

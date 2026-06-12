@@ -46,6 +46,7 @@ class EvaluationRunner:
             
             # 3. CREAR LOG DE ALERTA
             alert_log = AlertLog(
+                evaluation_id=self.evaluation_id,
                 alert_id=str(row['alert_id']),
                 alert_timestamp=row['timestamp'], 
                 alert_description=row['description'],
@@ -57,7 +58,7 @@ class EvaluationRunner:
                 execution_time=telemetry["execution_time"],
                 token_usage=telemetry["token_usage"],
                 llm_calls=telemetry["llm_calls"],
-                node_breakdown=json.dumps(telemetry["node_breakdown"]) 
+                node_breakdown=json.dumps(telemetry["node_breakdown"]),
             )
             
             # Guardamos la alerta

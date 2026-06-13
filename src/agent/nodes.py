@@ -56,12 +56,14 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
         start_time = time.time()
         prefix = "Represent this sentence for searching relevant passages: " # Para bge (asimétrico)
 
-        # query = state['classification'].mitre_description
+        desc = state['classification'].mitre_description
         query = state['classification'].mitre_keywords
         query_vector = embedder.embed_query(prefix + query)
-        results = mitre_store.search(query_vector, top_k=config.mitre_top_k, 
-                                    #  filter={'is_subtechnique': False}
-                                     )
+        # results = mitre_store.search(query_vector, top_k=config.mitre_top_k, 
+        #                             #  filter={'is_subtechnique': False}
+        #                              )
+
+        results = mitre_store.search_mitre_hybrid_simple(query_vector, desc, top_k=config.mitre_top_k)
 
         results_text = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
                         f"Name: {r['name']}\n"
@@ -152,12 +154,7 @@ def make_validation_node(llm, tracker):
         - Provide a detailed explanation of why you assigned that score.
         - Make a final decision on whether this technique should be included in the final report or not (decision=True/False).
         '''
-        # prompt = f'''
-        # You are a SOC analyst. Your task is to evaluate the relevance of the retrieved MITRE techniques and CVE vulnerabilities from an automatic search system.
-        # You must evaluate if each result is actually relevant to the original alert or whether it is semantic noise (for example, a MITRE technique that shares some keywords with the alert but is not actually related to the attack described in the alert).
-        # You also have a context window with previous and subsequent alerts that can help you understand better the situation and the relevance of the retrieved information. Use it to determine if the retrieved MITRE techniques and CVE vulnerabilities are actually relevant or are noise.
-        # '''
-
+ 
         validator = llm.with_structured_output(ValidationReport)
         llm_with_tracker = validator.with_config(callbacks=[tracker])
         validation_report = llm_with_tracker.invoke([HumanMessage(content=prompt)])

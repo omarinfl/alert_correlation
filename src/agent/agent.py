@@ -4,9 +4,10 @@ from langgraph.graph import StateGraph, END
 import time
 
 class SOCAgent:
-    def __init__(self, config, llm, alert_data, embedder, mitre_store, cve_store, tracker):
+    def __init__(self, config, llm_strict, llm_creative, alert_data, embedder, mitre_store, cve_store, tracker):
         self.config = config
-        self.llm = llm
+        self.llm_strict = llm_strict
+        self.llm_creative = llm_creative
         self.alert_data = alert_data
         self.embedder = embedder
         self.mitre_store = mitre_store
@@ -16,12 +17,12 @@ class SOCAgent:
 
     def _build_app(self):
         workflow = StateGraph(AgentState)
-        workflow.add_node('classification', make_classification_node(self.llm, self.tracker))
+        workflow.add_node('classification', make_classification_node(self.llm_strict, self.tracker))
         workflow.add_node('mitre_search_node', make_mitre_search_node(self.embedder, self.mitre_store, self.config, self.tracker))
         workflow.add_node('cve_search_node', make_cve_search_node(self.embedder, self.cve_store, self.tracker))
         workflow.add_node('alert_context_node', make_alert_context_node(self.config, self.alert_data, self.tracker))
-        workflow.add_node('validation_node', make_validation_node(self.llm, self.tracker))
-        workflow.add_node('final_report_node', make_final_report_node(self.config, self.llm, self.tracker))
+        workflow.add_node('validation_node', make_validation_node(self.llm_strict, self.tracker))
+        workflow.add_node('final_report_node', make_final_report_node(self.config, self.llm_creative, self.tracker))
 
         workflow.set_entry_point('classification')
 

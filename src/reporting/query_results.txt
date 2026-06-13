@@ -1,56 +1,51 @@
-{'vector': {'alert': {'exact': 9,
-   'parent': 0,
-   'sub': 0,
-   'total_t': 9,
-   'total_a': 9},
+unique_alerts_classification.json
+hybrid: hybrid_query(vector_store, query_vector, alert_text, desc_text, keywords_text, top_k=10)
+
+{'vector': {
+  'alert': {'exact': 9, 'parent': 0,'sub': 0,'total_t': 9,'total_a': 9},
   'desc': {'exact': 10, 'parent': 0, 'sub': 2, 'total_t': 12, 'total_a': 12},
-  'keywords': {'exact': 16,
-   'parent': 0,
-   'sub': 0,
-   'total_t': 16,
-   'total_a': 15},
+  'keywords': {'exact': 16,'parent': 0,'sub': 0,'total_t': 16,'total_a': 15},
   'combo': {'exact': 16, 'parent': 0, 'sub': 0, 'total_t': 16, 'total_a': 15}},
- 'BM25_full_text': {'alert': {'exact': 11,
-   'parent': 0,
-   'sub': 2,
-   'total_t': 13,
-   'total_a': 13},
+ 'BM25_full_text': {
+  'alert': {'exact': 11,'parent': 0,'sub': 2,'total_t': 13,'total_a': 13},
   'desc': {'exact': 12, 'parent': 0, 'sub': 2, 'total_t': 14, 'total_a': 12},
-  'keywords': {'exact': 14,
-   'parent': 0,
-   'sub': 1,
-   'total_t': 15,
-   'total_a': 14},
+  'keywords': {'exact': 14,'parent': 0,'sub': 1,'total_t': 15,'total_a': 14},
   'combo': {'exact': 18, 'parent': 0, 'sub': 2, 'total_t': 20, 'total_a': 18}},
- 'BM25_multi': {'alert': {'exact': 11,
-   'parent': 0,
-   'sub': 2,
-   'total_t': 13,
-   'total_a': 13},
+ 'BM25_multi': {
+  'alert': {'exact': 11,'parent': 0,'sub': 2,'total_t': 13,'total_a': 13},
   'desc': {'exact': 11, 'parent': 0, 'sub': 0, 'total_t': 11, 'total_a': 11},
-  'keywords': {'exact': 13,
-   'parent': 1,
-   'sub': 0,
-   'total_t': 14,
-   'total_a': 13},
+  'keywords': {'exact': 13,'parent': 1,'sub': 0,'total_t': 14,'total_a': 13},
   'combo': {'exact': 17, 'parent': 0, 'sub': 1, 'total_t': 18, 'total_a': 17}},
- 'hybrid': {'alert': {'exact': 14,
-   'parent': 0,
-   'sub': 1,
-   'total_t': 15,
-   'total_a': 14},
+ 'hybrid': {
+  'alert': {'exact': 14,'parent': 0,'sub': 1,'total_t': 15,'total_a': 14},
   'desc': {'exact': 15, 'parent': 0, 'sub': 1, 'total_t': 16, 'total_a': 15},
-  'keywords': {'exact': 16,
-   'parent': 0,
-   'sub': 0,
-   'total_t': 16,
-   'total_a': 15},
+  'keywords': {'exact': 16,'parent': 0,'sub': 0,'total_t': 16,'total_a': 15},
   'combo': {'exact': 16, 'parent': 0, 'sub': 0, 'total_t': 16, 'total_a': 15}},
- 'all': {'alert': {'exact': 0,
-   'parent': 0,
-   'sub': 0,
-   'total_t': 0,
-   'total_a': 0},
-  'desc': {'exact': 0, 'parent': 0, 'sub': 0, 'total_t': 0, 'total_a': 0},
-  'keywords': {'exact': 0, 'parent': 0, 'sub': 0, 'total_t': 0, 'total_a': 0},
-  'combo': {'exact': 20, 'parent': 0, 'sub': 1, 'total_t': 21, 'total_a': 19}}}
+ 'all': {'exact': 20, 'parent': 0, 'sub': 1, 'total_t': 21, 'total_a': 19}}
+
+
+unique_alerts_classification_v2.json
+hybrid: query_hybrid_simple(mitre_store, emb_desc, description, top_k=10) 0.6, 0.4
+!! description en la busqueda BM25 en todas (hybrid)
+ 
+ {'vector': {
+  'alert': {'exact': 9,'parent': 0,'sub': 0,'total_t': 9,'total_a': 9},
+  'desc': {'exact': 9, 'parent': 0, 'sub': 1, 'total_t': 10, 'total_a': 10},
+  'keywords': {'exact': 17,'parent': 0,'sub': 0,'total_t': 17,'total_a': 16},
+  'combo': {'exact': 17, 'parent': 0, 'sub': 0, 'total_t': 17, 'total_a': 16}},
+ 'BM25_full_text': {
+  'alert': {'exact': 11,'parent': 0,'sub': 2,'total_t': 13,'total_a': 13},
+  'desc': {'exact': 15, 'parent': 0, 'sub': 3, 'total_t': 18, 'total_a': 17},
+  'keywords': {'exact': 14,'parent': 0,'sub': 1,'total_t': 15,'total_a': 14},
+  'combo': {'exact': 19, 'parent': 0, 'sub': 1, 'total_t': 20, 'total_a': 19}},
+ 'BM25_multi': {
+  'alert': {'exact': 11,'parent': 0,'sub': 2,'total_t': 13,'total_a': 13},
+  'desc': {'exact': 11, 'parent': 0, 'sub': 1, 'total_t': 12, 'total_a': 12},
+  'keywords': {'exact': 13,'parent': 1,'sub': 0,'total_t': 14,'total_a': 13},
+  'combo': {'exact': 17, 'parent': 0, 'sub': 1, 'total_t': 18, 'total_a': 17}},
+ 'hybrid': {
+  'alert': {'exact': 16,'parent': 0,'sub': 3,'total_t': 19,'total_a': 18},
+  'desc': {'exact': 16, 'parent': 0, 'sub': 3, 'total_t': 19, 'total_a': 18},
+  'keywords': {'exact': 17,'parent': 0,'sub': 3,'total_t': 20,'total_a': 19},
+  'combo': {'exact': 17, 'parent': 0, 'sub': 3, 'total_t': 20, 'total_a': 19}},
+ 'all':{'exact': 21, 'parent': 0, 'sub': 0, 'total_t': 21, 'total_a': 19}}

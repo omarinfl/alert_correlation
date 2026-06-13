@@ -22,6 +22,7 @@ class CSVAlertData(AlertData):
     
     def get_context_window(self, original_alert: Dict[str, Any], window_size: int) -> List[Dict[str, Any]]:
         df = self.df
+        df.sort_values(by='timestamp', inplace=True)
         alert_time = pd.to_datetime(original_alert['timestamp'])
         previous_alerts = df[df['timestamp'] < alert_time].tail(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
         subsequent_alerts = df[df['timestamp'] > alert_time].head(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]

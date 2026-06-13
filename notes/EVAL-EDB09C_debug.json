@@ -1,0 +1,480 @@
+[
+    {
+        "original_alert": {
+            "timestamp": "2025-09-22T18:37:00.601+0000",
+            "rule": {
+                "level": 6,
+                "description": "Processes running for all users were queried with ps command.",
+                "id": "92604",
+                "firedtimes": 1,
+                "mail": false,
+                "groups": [
+                    "audit_detections"
+                ]
+            },
+            "agent": {
+                "id": "002",
+                "name": "videoserver",
+                "ip": "172.17.100.121"
+            },
+            "manager": {
+                "name": "wazuh"
+            },
+            "id": "1758566220.11498102",
+            "full_log": "type=SYSCALL msg=audit(1758566218.934:4968): arch=c000003e syscall=59 success=yes exit=0 a0=55de6e506188 a1=55de6e4f6c90 a2=55de6e5060f8 a3=1b6 items=3 ppid=3135 pid=3136 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=pts0 ses=4294967295 comm=\"ps\" exe=\"/usr/bin/ps\" subj==unconfined key=\"T1166_Seuid_and_Setgid\"\u001dARCH=x86_64 SYSCALL=execve AUID=\"unset\" UID=\"www-data\" GID=\"www-data\" EUID=\"www-data\" SUID=\"www-data\" FSUID=\"www-data\" EGID=\"www-data\" SGID=\"www-data\" FSGID=\"www-data\" type=EXECVE msg=audit(1758566218.934:4968): argc=2 a0=\"ps\" a1=\"auxwww\" type=PATH msg=audit(1758566218.934:4968): item=0 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566218.934:4968): item=1 name=\"/usr/bin/ps\" inode=17887 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PATH msg=audit(1758566218.934:4968): item=2 name=\"/lib64/ld-linux-x86-64.so.2\" inode=1964 dev=fe:01 mode=0100755 ouid=0 ogid=0 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0\u001dOUID=\"root\" OGID=\"root\" type=PROCTITLE msg=audit(1758566218.934:4968): proctitle=707300617578777777",
+            "decoder": {
+                "parent": "auditd",
+                "name": "auditd"
+            },
+            "data": {
+                "audit": {
+                    "type": "SYSCALL",
+                    "id": "4968",
+                    "arch": "c000003e",
+                    "syscall": "59",
+                    "success": "yes",
+                    "exit": "0",
+                    "ppid": "3135",
+                    "pid": "3136",
+                    "auid": "4294967295",
+                    "uid": "33",
+                    "gid": "33",
+                    "euid": "33",
+                    "suid": "33",
+                    "fsuid": "33",
+                    "egid": "33",
+                    "sgid": "33",
+                    "fsgid": "33",
+                    "tty": "pts0",
+                    "session": "4294967295",
+                    "command": "ps",
+                    "exe": "/usr/bin/ps",
+                    "key": "T1166_Seuid_and_Setgid",
+                    "execve": {
+                        "a0": "ps",
+                        "a1": "auxwww"
+                    },
+                    "file": {
+                        "name": "/usr/bin/ps",
+                        "inode": "17887",
+                        "mode": "0100755"
+                    }
+                }
+            },
+            "location": "/var/log/audit/audit.log"
+        },
+        "mitre": {
+            "search": true,
+            "description": "The alert indicates that the 'ps auxwww' command was executed by the 'www-data' user. This command is commonly used for process discovery to list all running processes on the system, which is a frequent activity during the reconnaissance phase of an attack to identify potential targets or security software.",
+            "keywords": "ps auxwww, process discovery, system information discovery"
+        },
+        "cve": {
+            "search": false,
+            "description": "",
+            "keywords": ""
+        },
+        "retrieved_mitre": "MITRE results:\nTechnique ID: T1057\nName: Process Discovery\nDescription: Adversaries may attempt to get information about running processes on a system. Information obtained could be used to gain an understanding of common software/applications running on systems within the network. Administrator or otherwise elevated access may provide better process details. Adversaries may use the information from [Process Discovery](https://attack.mitre.org/techniques/T1057) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nIn Windows environments, adversaries could obtain details on running processes using the [Tasklist](https://attack.mitre.org/software/S0057) utility via [cmd](https://attack.mitre.org/software/S0106) or <code>Get-Process</code> via [PowerShell](https://attack.mitre.org/techniques/T1059/001). Information about processes can also be extracted from the output of [Native API](https://attack.mitre.org/techniques/T1106) calls such as <code>CreateToolhelp32Snapshot</code>. In Mac and Linux, this is accomplished with the <code>ps</code> command. Adversaries may also opt to enumerate processes via `/proc`. ESXi also supports use of the `ps` command, as well as `esxcli system process list`.(Citation: Sygnia ESXi Ransomware 2025)(Citation: Crowdstrike Hypervisor Jackpotting Pt 2 2021)\n\nOn network devices, [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) commands such as `show processes` can be used to display current running processes.(Citation: US-CERT-TA18-106A)(Citation: show_processes_cisco_cmd)\nTactics: ['discovery']\nPlatforms: ['ESXi', 'Linux', 'macOS', 'Network Devices', 'Windows']\n-----------------\nTechnique ID: T1010\nName: Application Window Discovery\nDescription: Adversaries may attempt to get a listing of open application windows. Window listings could convey information about how the system is used.(Citation: Prevailion DarkWatchman 2021) For example, information about application windows could be used identify potential data to collect as well as identifying security tooling ([Security Software Discovery](https://attack.mitre.org/techniques/T1518/001)) to evade.(Citation: ESET Grandoreiro April 2020)\n\nAdversaries typically abuse system features for this type of enumeration. For example, they may gather information through native system features such as [Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059) commands and [Native API](https://attack.mitre.org/techniques/T1106) functions.\nTactics: ['discovery']\nPlatforms: ['Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1480\nName: Execution Guardrails\nDescription: Adversaries may use execution guardrails to constrain execution or actions based on adversary supplied and environment specific conditions that are expected to be present on the target. Guardrails ensure that a payload only executes against an intended target and reduces collateral damage from an adversary’s campaign.(Citation: FireEye Kevin Mandia Guardrails) Values an adversary can provide about a target system or environment to use as guardrails may include specific network share names, attached physical devices, files, joined Active Directory (AD) domains, and local/external IP addresses.(Citation: FireEye Outlook Dec 2019)\n\nGuardrails can be used to prevent exposure of capabilities in environments that are not intended to be compromised or operated within. This use of guardrails is distinct from typical [Virtualization/Sandbox Evasion](https://attack.mitre.org/techniques/T1497). While use of [Virtualization/Sandbox Evasion](https://attack.mitre.org/techniques/T1497) may involve checking for known sandbox values and continuing with execution only if there is no match, the use of guardrails will involve checking for an expected target-specific value and only continuing with execution if there is such a match.\n\nAdversaries may identify and block certain user-agents to evade defenses and narrow the scope of their attack to victims and platforms on which it will be most effective. A user-agent self-identifies data such as a user's software application, operating system, vendor, and version. Adversaries may check user-agents for operating system identification and then only serve malware for the exploitable software while ignoring all other operating systems.(Citation: Trellix-Qakbot)\nTactics: ['stealth']\nPlatforms: ['ESXi', 'Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1018\nName: Remote System Discovery\nDescription: Adversaries may attempt to get a listing of other systems by IP address, hostname, or other logical identifier on a network that may be used for Lateral Movement from the current system. Functionality could exist within remote access tools to enable this, but utilities available on the operating system could also be used such as  [Ping](https://attack.mitre.org/software/S0097), <code>net view</code> using [Net](https://attack.mitre.org/software/S0039), or, on ESXi servers, `esxcli network diag ping`.\n\nAdversaries may also analyze data from local host files (ex: <code>C:\\Windows\\System32\\Drivers\\etc\\hosts</code> or <code>/etc/hosts</code>) or other passive means (such as local [Arp](https://attack.mitre.org/software/S0099) cache entries) in order to discover the presence of remote systems in an environment.\n\nAdversaries may also target discovery of network infrastructure as well as leverage [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) commands on network devices to gather detailed information about systems within a network (e.g. <code>show cdp neighbors</code>, <code>show arp</code>).(Citation: US-CERT-TA18-106A)(Citation: CISA AR21-126A FIVEHANDS May 2021)  \n\nTactics: ['discovery']\nPlatforms: ['ESXi', 'Linux', 'macOS', 'Network Devices', 'Windows']\n-----------------\nTechnique ID: T1007\nName: System Service Discovery\nDescription: Adversaries may try to gather information about registered local system services. Adversaries may obtain information about services using tools as well as OS utility commands such as <code>sc query</code>, <code>tasklist /svc</code>, <code>systemctl --type=service</code>, and <code>net start</code>. Adversaries may also gather information about schedule tasks via commands such as `schtasks` on Windows or `crontab -l` on Linux and macOS.(Citation: Elastic Security Labs GOSAR 2024)(Citation: SentinelLabs macOS Malware 2021)(Citation: Splunk Linux Gormir 2024)(Citation: Aquasec Kinsing 2020)\n\nAdversaries may use the information from [System Service Discovery](https://attack.mitre.org/techniques/T1007) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\nTactics: ['discovery']\nPlatforms: ['Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1518.001\nName: Security Software Discovery\nDescription: Adversaries may attempt to get a listing of security software, configurations, defensive tools, and sensors that are installed on a system or in a cloud environment. This may include things such as cloud monitoring agents and anti-virus. Adversaries may use the information from [Security Software Discovery](https://attack.mitre.org/techniques/T1518/001) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nExample commands that can be used to obtain security software information are [netsh](https://attack.mitre.org/software/S0108), <code>reg query</code> with [Reg](https://attack.mitre.org/software/S0075), <code>dir</code> with [cmd](https://attack.mitre.org/software/S0106), and [Tasklist](https://attack.mitre.org/software/S0057), but other indicators of discovery behavior may be more specific to the type of software or security system the adversary is looking for. It is becoming more common to see macOS malware perform checks for LittleSnitch and KnockKnock software.\n\nAdversaries may also utilize the [Cloud API](https://attack.mitre.org/techniques/T1059/009) to discover cloud-native security software installed on compute infrastructure, such as the AWS CloudWatch agent, Azure VM Agent, and Google Cloud Monitor agent. These agents  may collect  metrics and logs from the VM, which may be centrally aggregated in a cloud-based monitoring platform.\nTactics: ['discovery']\nPlatforms: ['IaaS', 'Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1518\nName: Software Discovery\nDescription: Adversaries may attempt to get a listing of software and software versions that are installed on a system or in a cloud environment. Adversaries may use the information from [Software Discovery](https://attack.mitre.org/techniques/T1518) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nSuch software may be deployed widely across the environment for configuration management or security reasons, such as [Software Deployment Tools](https://attack.mitre.org/techniques/T1072), and may allow adversaries broad access to infect devices or move laterally.\n\nAdversaries may attempt to enumerate software for a variety of reasons, such as figuring out what security measures are present or if the compromised system has a version of software that is vulnerable to [Exploitation for Privilege Escalation](https://attack.mitre.org/techniques/T1068).\nTactics: ['discovery']\nPlatforms: ['ESXi', 'IaaS', 'Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1087\nName: Account Discovery\nDescription: Adversaries may attempt to get a listing of valid accounts, usernames, or email addresses on a system or within a compromised environment. This information can help adversaries determine which accounts exist, which can aid in follow-on behavior such as brute-forcing, spear-phishing attacks, or account takeovers (e.g., [Valid Accounts](https://attack.mitre.org/techniques/T1078)).\n\nAdversaries may use several methods to enumerate accounts, including abuse of existing tools, built-in commands, and potential misconfigurations that leak account names and roles or permissions in the targeted environment.\n\nFor examples, cloud environments typically provide easily accessible interfaces to obtain user lists.(Citation: AWS List Users)(Citation: Google Cloud - IAM Servie Accounts List API) On hosts, adversaries can use default [PowerShell](https://attack.mitre.org/techniques/T1059/001) and other command line functionality to identify accounts. Information about email addresses and accounts may also be extracted by searching an infected system’s files.\nTactics: ['discovery']\nPlatforms: ['ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1119\nName: Automated Collection\nDescription: Once established within a system or network, an adversary may use automated techniques for collecting internal data. Methods for performing this technique could include use of a [Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059) to search for and copy information fitting set criteria such as file type, location, or name at specific time intervals. \n\nIn cloud-based environments, adversaries may also use cloud APIs, data pipelines, command line interfaces, or extract, transform, and load (ETL) services to automatically collect data.(Citation: Mandiant UNC3944 SMS Phishing 2023) \n\nThis functionality could also be built into remote access tools. \n\nThis technique may incorporate use of other techniques such as [File and Directory Discovery](https://attack.mitre.org/techniques/T1083) and [Lateral Tool Transfer](https://attack.mitre.org/techniques/T1570) to identify and move files, as well as [Cloud Service Dashboard](https://attack.mitre.org/techniques/T1538) and [Cloud Storage Object Discovery](https://attack.mitre.org/techniques/T1619) to identify resources in cloud environments.\nTactics: ['collection']\nPlatforms: ['IaaS', 'Linux', 'macOS', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1033\nName: System Owner/User Discovery\nDescription: Adversaries may attempt to identify the primary user, currently logged in user, set of users that commonly uses a system, or whether a user is actively using the system. They may do this, for example, by retrieving account usernames or by using [OS Credential Dumping](https://attack.mitre.org/techniques/T1003). The information may be collected in a number of different ways using other Discovery techniques, because user and username details are prevalent throughout a system and include running process ownership, file/directory ownership, session information, and system logs. Adversaries may use the information from [System Owner/User Discovery](https://attack.mitre.org/techniques/T1033) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nVarious utilities and commands may acquire this information, including <code>whoami</code>. In macOS and Linux, the currently logged in user can be identified with <code>w</code> and <code>who</code>. On macOS the <code>dscl . list /Users | grep -v '_'</code> command can also be used to enumerate user accounts. Environment variables, such as <code>%USERNAME%</code> and <code>$USER</code>, may also be used to access this information.\n\nOn network devices, [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) commands such as `show users` and `show ssh` can be used to display users currently logged into the device.(Citation: show_ssh_users_cmd_cisco)(Citation: US-CERT TA18-106A Network Infrastructure Devices 2018)\nTactics: ['discovery']\nPlatforms: ['Linux', 'macOS', 'Network Devices', 'Windows']\n-----------------",
+        "retrieved_cve": "No relevant CVE information found in the alert.",
+        "validation": {
+            "mitre_evaluations": [
+                {
+                    "item_id": "T1057",
+                    "relevance_score": 1.0,
+                    "explanation": "The alert explicitly detects the execution of the 'ps auxwww' command, which is a classic method for process discovery on Linux systems. This directly maps to the T1057 technique.",
+                    "decision": true,
+                    "data": "Technique ID: T1057\nName: Process Discovery\nDescription: Adversaries may attempt to get information about running processes on a system. Information obtained could be used to gain an understanding of common software/applications running on systems within the network. Administrator or otherwise elevated access may provide better process details. Adversaries may use the information from [Process Discovery](https://attack.mitre.org/techniques/T1057) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nIn Windows environments, adversaries could obtain details on running processes using the [Tasklist](https://attack.mitre.org/software/S0057) utility via [cmd](https://attack.mitre.org/software/S0106) or <code>Get-Process</code> via [PowerShell](https://attack.mitre.org/techniques/T1059/001). Information about processes can also be extracted from the output of [Native API](https://attack.mitre.org/techniques/T1106) calls such as <code>CreateToolhelp32Snapshot</code>. In Mac and Linux, this is accomplished with the <code>ps</code> command. Adversaries may also opt to enumerate processes via `/proc`. ESXi also supports use of the `ps` command, as well as `esxcli system process list`.(Citation: Sygnia ESXi Ransomware 2025)(Citation: Crowdstrike Hypervisor Jackpotting Pt 2 2021)\n\nOn network devices, [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) commands such as `show processes` can be used to display current running processes.(Citation: US-CERT-TA18-106A)(Citation: show_processes_cisco_cmd)\nTactics: ['discovery']\nPlatforms: ['ESXi', 'Linux', 'macOS', 'Network Devices', 'Windows']"
+                },
+                {
+                    "item_id": "T1010",
+                    "relevance_score": 0.2,
+                    "explanation": "While this is a discovery technique, the alert specifically shows process enumeration, not application window enumeration. This is likely noise.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1480",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of execution guardrails in the alert. This is unrelated to the simple execution of the 'ps' command.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1018",
+                    "relevance_score": 0.2,
+                    "explanation": "The alert shows process discovery, not remote system discovery. While discovery techniques are often chained, there is no evidence of this specific activity here.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1007",
+                    "relevance_score": 0.3,
+                    "explanation": "While related to discovery, the alert specifically targets process listing rather than system service enumeration.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1518.001",
+                    "relevance_score": 0.4,
+                    "explanation": "Adversaries often use 'ps' to discover security software, but the alert does not confirm this intent. It is a possible secondary intent but not the primary action detected.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1518",
+                    "relevance_score": 0.3,
+                    "explanation": "General software discovery is a broader category, but T1057 is more specific and accurate for the 'ps' command execution.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1087",
+                    "relevance_score": 0.2,
+                    "explanation": "The alert does not show account enumeration activity.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1119",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of automated data collection in the alert.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1033",
+                    "relevance_score": 0.5,
+                    "explanation": "The 'ps auxwww' command can reveal the user running processes, which overlaps with system owner/user discovery, but T1057 remains the primary technique.",
+                    "decision": false,
+                    "data": ""
+                }
+            ],
+            "cve_evaluations": []
+        },
+        "real_ttps": [
+            "T1057"
+        ],
+        "predicted_ttps": [
+            "T1057"
+        ],
+        "real_cves": [],
+        "predicted_cves": []
+    },
+    {
+        "original_alert": {
+            "timestamp": "2025-09-22T18:51:01.034+0000",
+            "rule": {
+                "level": 3,
+                "description": "sshd: authentication success.",
+                "id": "5715",
+                "firedtimes": 1,
+                "mail": false,
+                "groups": [
+                    "syslog",
+                    "sshd",
+                    "authentication_success"
+                ],
+                "gdpr": [
+                    "IV_32.2"
+                ],
+                "gpg13": [
+                    "7.1",
+                    "7.2"
+                ],
+                "hipaa": [
+                    "164.312.b"
+                ],
+                "nist_800_53": [
+                    "AU.14",
+                    "AC.7"
+                ],
+                "pci_dss": [
+                    "10.2.5"
+                ],
+                "tsc": [
+                    "CC6.8",
+                    "CC7.2",
+                    "CC7.3"
+                ]
+            },
+            "agent": {
+                "id": "002",
+                "name": "videoserver",
+                "ip": "172.17.100.121"
+            },
+            "manager": {
+                "name": "wazuh"
+            },
+            "id": "1758567061.11560697",
+            "full_log": "Sep 22 18:51:00 videoserver sshd[17243]: Accepted publickey for root from 10.12.0.222 port 40718 ssh2: ED25519 SHA256:erECc93zjoYONyq1nNcu4EwrYe78nzBExDzOmsokkrc",
+            "predecoder": {
+                "program_name": "sshd",
+                "timestamp": "Sep 22 18:51:00",
+                "hostname": "videoserver"
+            },
+            "decoder": {
+                "parent": "sshd",
+                "name": "sshd"
+            },
+            "data": {
+                "srcip": "10.12.0.222",
+                "srcport": "40718",
+                "dstuser": "root"
+            },
+            "location": "journald"
+        },
+        "mitre": {
+            "search": true,
+            "description": "The alert indicates a successful SSH authentication for the root user from a remote IP address using public key authentication. This behavior relates to remote access and the use of valid accounts to access system services.",
+            "keywords": "Remote System Services, SSH, Valid Accounts"
+        },
+        "cve": {
+            "search": false,
+            "description": "",
+            "keywords": ""
+        },
+        "retrieved_mitre": "MITRE results:\nTechnique ID: T1098.004\nName: SSH Authorized Keys\nDescription: Adversaries may modify the SSH <code>authorized_keys</code> file to maintain persistence on a victim host. Linux distributions, macOS, and ESXi hypervisors commonly use key-based authentication to secure the authentication process of SSH sessions for remote management. The <code>authorized_keys</code> file in SSH specifies the SSH keys that can be used for logging into the user account for which the file is configured. This file is usually found in the user's home directory under <code>&lt;user-home&gt;/.ssh/authorized_keys</code> (or, on ESXi, `/etc/ssh/keys-<username>/authorized_keys`).(Citation: SSH Authorized Keys) Users may edit the system’s SSH config file to modify the directives `PubkeyAuthentication` and `RSAAuthentication` to the value `yes` to ensure public key and RSA authentication are enabled, as well as modify the directive `PermitRootLogin` to the value `yes` to enable root authentication via SSH.(Citation: Broadcom ESXi SSH) The SSH config file is usually located under <code>/etc/ssh/sshd_config</code>.\n\nAdversaries may modify SSH <code>authorized_keys</code> files directly with scripts or shell commands to add their own adversary-supplied public keys. In cloud environments, adversaries may be able to modify the SSH authorized_keys file of a particular virtual machine via the command line interface or rest API. For example, by using the Google Cloud CLI’s “add-metadata” command an adversary may add SSH keys to a user account.(Citation: Google Cloud Add Metadata)(Citation: Google Cloud Privilege Escalation) Similarly, in Azure, an adversary may update the authorized_keys file of a virtual machine via a PATCH request to the API.(Citation: Azure Update Virtual Machines) This ensures that an adversary possessing the corresponding private key may log in as an existing user via SSH.(Citation: Venafi SSH Key Abuse)(Citation: Cybereason Linux Exim Worm) It may also lead to privilege escalation where the virtual machine or instance has distinct permissions from the requesting user.\n\nWhere authorized_keys files are modified via cloud APIs or command line interfaces, an adversary may achieve privilege escalation on the target virtual machine if they add a key to a higher-privileged user. \n\nSSH keys can also be added to accounts on network devices, such as with the `ip ssh pubkey-chain` [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) command.(Citation: cisco_ip_ssh_pubkey_ch_cmd)\nTactics: ['persistence', 'privilege-escalation']\nPlatforms: ['ESXi', 'IaaS', 'Linux', 'macOS', 'Network Devices']\n-----------------\nTechnique ID: T1110.004\nName: Credential Stuffing\nDescription: Adversaries may use credentials obtained from breach dumps of unrelated accounts to gain access to target accounts through credential overlap. Occasionally, large numbers of username and password pairs are dumped online when a website or service is compromised and the user account credentials accessed. The information may be useful to an adversary attempting to compromise accounts by taking advantage of the tendency for users to use the same passwords across personal and business accounts.\n\nCredential stuffing is a risky option because it could cause numerous authentication failures and account lockouts, depending on the organization's login failure policies.\n\nTypically, management services over commonly used ports are used when stuffing credentials. Commonly targeted services include the following:\n\n* SSH (22/TCP)\n* Telnet (23/TCP)\n* FTP (21/TCP)\n* NetBIOS / SMB / Samba (139/TCP & 445/TCP)\n* LDAP (389/TCP)\n* Kerberos (88/TCP)\n* RDP / Terminal Services (3389/TCP)\n* HTTP/HTTP Management Services (80/TCP & 443/TCP)\n* MSSQL (1433/TCP)\n* Oracle (1521/TCP)\n* MySQL (3306/TCP)\n* VNC (5900/TCP)\n\nIn addition to management services, adversaries may \"target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,\" as well as externally facing email applications, such as Office 365.(Citation: US-CERT TA18-068A 2018)\nTactics: ['credential-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1563.001\nName: SSH Hijacking\nDescription: Adversaries may hijack a legitimate user's SSH session to move laterally within an environment. Secure Shell (SSH) is a standard means of remote access on Linux and macOS systems. It allows a user to connect to another system via an encrypted tunnel, commonly authenticating through a password, certificate or the use of an asymmetric encryption key pair.\n\nIn order to move laterally from a compromised host, adversaries may take advantage of trust relationships established with other systems via public key authentication in active SSH sessions by hijacking an existing connection to another system. This may occur through compromising the SSH agent itself or by having access to the agent's socket. If an adversary is able to obtain root access, then hijacking SSH sessions is likely trivial.(Citation: Slideshare Abusing SSH)(Citation: SSHjack Blackhat)(Citation: Clockwork SSH Agent Hijacking)(Citation: Breach Post-mortem SSH Hijack)\n\n[SSH Hijacking](https://attack.mitre.org/techniques/T1563/001) differs from use of [SSH](https://attack.mitre.org/techniques/T1021/004) because it hijacks an existing SSH session rather than creating a new session using [Valid Accounts](https://attack.mitre.org/techniques/T1078).\nTactics: ['lateral-movement']\nPlatforms: ['Linux', 'macOS']\n-----------------\nTechnique ID: T1133\nName: External Remote Services\nDescription: Adversaries may leverage external-facing remote services to initially access and/or persist within a network. Remote services such as VPNs, Citrix, and other access mechanisms allow users to connect to internal enterprise network resources from external locations. There are often remote service gateways that manage connections and credential authentication for these services. Services such as [Windows Remote Management](https://attack.mitre.org/techniques/T1021/006) and [VNC](https://attack.mitre.org/techniques/T1021/005) can also be used externally.(Citation: MacOS VNC software for Remote Desktop)\n\nAccess to [Valid Accounts](https://attack.mitre.org/techniques/T1078) to use the service is often a requirement, which could be obtained through credential pharming or by obtaining the credentials from users after compromising the enterprise network.(Citation: Volexity Virtual Private Keylogging) Access to remote services may be used as a redundant or persistent access mechanism during an operation.\n\nAccess may also be gained through an exposed service that doesn’t require authentication. In containerized environments, this may include an exposed Docker API, Kubernetes API server, kubelet, or web application such as the Kubernetes dashboard.(Citation: Trend Micro Exposed Docker Server)(Citation: Unit 42 Hildegard Malware)\n\nAdversaries may also establish persistence on network by configuring a Tor hidden service on a compromised system. Adversaries may utilize the tool `ShadowLink` to facilitate the installation and configuration of the Tor hidden service. Tor hidden service is then accessible via the Tor network because `ShadowLink` sets up a .onion address on the compromised system. `ShadowLink` may be used to forward any inbound connections to RDP, allowing the adversaries to have remote access.(Citation: The BadPilot campaign) Adversaries may get `ShadowLink` to persist on a system by masquerading it as an MS Defender application.(Citation: Russian threat actors dig in, prepare to seize on war fatigue)\nTactics: ['persistence', 'initial-access']\nPlatforms: ['Containers', 'Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1021.004\nName: SSH\nDescription: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into remote machines using Secure Shell (SSH). The adversary may then perform actions as the logged-on user.\n\nSSH is a protocol that allows authorized users to open remote shells on other computers. Many Linux and macOS versions come with SSH installed by default, although typically disabled until the user enables it. On ESXi, SSH can be enabled either directly on the host (e.g., via `vim-cmd hostsvc/enable_ssh`) or via vCenter.(Citation: Sygnia ESXi Ransomware 2025)(Citation: TrendMicro ESXI Ransomware)(Citation: Sygnia Abyss Locker 2025) The SSH server can be configured to use standard password authentication or public-private keypairs in lieu of or in addition to a password. In this authentication scenario, the user’s public key must be in a special file on the computer running the server that lists which keypairs are allowed to login as that user (i.e., [SSH Authorized Keys](https://attack.mitre.org/techniques/T1098/004)).\nTactics: ['lateral-movement']\nPlatforms: ['ESXi', 'Linux', 'macOS']\n-----------------\nTechnique ID: T1110.003\nName: Password Spraying\nDescription: Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. 'Password01'), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords. (Citation: BlackHillsInfosec Password Spraying)\n\nTypically, management services over commonly used ports are used when password spraying. Commonly targeted services include the following:\n\n* SSH (22/TCP)\n* Telnet (23/TCP)\n* FTP (21/TCP)\n* NetBIOS / SMB / Samba (139/TCP & 445/TCP)\n* LDAP (389/TCP)\n* Kerberos (88/TCP)\n* RDP / Terminal Services (3389/TCP)\n* HTTP/HTTP Management Services (80/TCP & 443/TCP)\n* MSSQL (1433/TCP)\n* Oracle (1521/TCP)\n* MySQL (3306/TCP)\n* VNC (5900/TCP)\n\nIn addition to management services, adversaries may \"target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,\" as well as externally facing email applications, such as Office 365.(Citation: US-CERT TA18-068A 2018)\n\nIn order to avoid detection thresholds, adversaries may deliberately throttle password spraying attempts to avoid triggering security alerting. Additionally, adversaries may leverage LDAP and Kerberos authentication attempts, which are less likely to trigger high-visibility events such as Windows \"logon failure\" event ID 4625 that is commonly triggered by failed SMB connection attempts.(Citation: Microsoft Storm-0940)  \nTactics: ['credential-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'Network Devices', 'Office Suite', 'SaaS', 'Windows', 'macOS']\n-----------------\nTechnique ID: T1078.001\nName: Default Accounts\nDescription: Adversaries may obtain and abuse credentials of a default account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Default accounts are those that are built-into an OS, such as the Guest or Administrator accounts on Windows systems. Default accounts also include default factory/provider set accounts on other types of systems, software, or devices, including the root user account in AWS, the root user account in ESXi, and the default service account in Kubernetes.(Citation: Microsoft Local Accounts Feb 2019)(Citation: AWS Root User)(Citation: Threat Matrix for Kubernetes)\n\nDefault accounts are not limited to client machines; rather, they also include accounts that are preset for equipment such as network devices and computer applications, whether they are internal, open source, or commercial. Appliances that come preset with a username and password combination pose a serious threat to organizations that do not change it post installation, as they are easy targets for an adversary. Similarly, adversaries may also utilize publicly disclosed or stolen [Private Keys](https://attack.mitre.org/techniques/T1552/004) or credential materials to legitimately connect to remote environments via [Remote Services](https://attack.mitre.org/techniques/T1021).(Citation: Metasploit SSH Module)\n\nDefault accounts may be created on a system after initial setup by connecting or integrating it with another application. For example, when an ESXi server is connected to a vCenter server, a default privileged account called `vpxuser` is created on the ESXi server. If a threat actor is able to compromise this account’s credentials (for example, via [Exploitation for Credential Access](https://attack.mitre.org/techniques/T1212) on the vCenter host), they will then have access to the ESXi server.(Citation: Google Cloud Threat Intelligence VMWare ESXi Zero-Day 2023)(Citation: Pentera vCenter Information Disclosure)\nTactics: ['stealth', 'persistence', 'privilege-escalation', 'initial-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1110\nName: Brute Force\nDescription: Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained.(Citation: TrendMicro Pawn Storm Dec 2020) Without knowledge of the password for an account or set of accounts, an adversary may systematically guess the password using a repetitive or iterative mechanism.(Citation: Dragos Crashoverride 2018) Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials or offline against previously acquired credential data, such as password hashes.\n\nBrute forcing credentials may take place at various points during a breach. For example, adversaries may attempt to brute force access to [Valid Accounts](https://attack.mitre.org/techniques/T1078) within a victim environment leveraging knowledge gathered from other post-compromise behaviors such as [OS Credential Dumping](https://attack.mitre.org/techniques/T1003), [Account Discovery](https://attack.mitre.org/techniques/T1087), or [Password Policy Discovery](https://attack.mitre.org/techniques/T1201). Adversaries may also combine brute forcing activity with behaviors such as [External Remote Services](https://attack.mitre.org/techniques/T1133) as part of Initial Access. \n\nIf an adversary guesses the correct password but fails to login to a compromised account due to location-based conditional access policies, they may change their infrastructure until they match the victim’s location and therefore bypass those policies.(Citation: ReliaQuest Health Care Social Engineering Campaign 2024)\nTactics: ['credential-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1563\nName: Remote Service Session Hijacking\nDescription: Adversaries may take control of preexisting sessions with remote services to move laterally in an environment. Users may use valid credentials to log into a service specifically designed to accept remote connections, such as telnet, SSH, and RDP. When a user logs into a service, a session will be established that will allow them to maintain a continuous interaction with that service.\n\nAdversaries may commandeer these sessions to carry out actions on remote systems. [Remote Service Session Hijacking](https://attack.mitre.org/techniques/T1563) differs from use of [Remote Services](https://attack.mitre.org/techniques/T1021) because it hijacks an existing session rather than creating a new session using [Valid Accounts](https://attack.mitre.org/techniques/T1078).(Citation: RDP Hijacking Medium)(Citation: Breach Post-mortem SSH Hijack)\nTactics: ['lateral-movement']\nPlatforms: ['Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1589.002\nName: Email Addresses\nDescription: Adversaries may gather email addresses that can be used during targeting. Even if internal instances exist, organizations may have public-facing email infrastructure and addresses for employees.\n\nAdversaries may easily gather email addresses, since they may be readily available and exposed via online or other accessible data sets (ex: [Social Media](https://attack.mitre.org/techniques/T1593/001) or [Search Victim-Owned Websites](https://attack.mitre.org/techniques/T1594)).(Citation: HackersArise Email)(Citation: CNET Leaks) Email addresses could also be enumerated via more active means (i.e. [Active Scanning](https://attack.mitre.org/techniques/T1595)), such as probing and analyzing responses from authentication services that may reveal valid usernames in a system.(Citation: GrimBlog UsernameEnum) For example, adversaries may be able to enumerate email addresses in Office 365 environments by querying a variety of publicly available API endpoints, such as autodiscover and GetCredentialType.(Citation: GitHub Office 365 User Enumeration)(Citation: Azure Active Directory Reconnaisance)\n\nGathering this information may reveal opportunities for other forms of reconnaissance (ex: [Search Open Websites/Domains](https://attack.mitre.org/techniques/T1593) or [Phishing for Information](https://attack.mitre.org/techniques/T1598)), establishing operational resources (ex: [Email Accounts](https://attack.mitre.org/techniques/T1586/002)), and/or initial access (ex: [Phishing](https://attack.mitre.org/techniques/T1566) or [Brute Force](https://attack.mitre.org/techniques/T1110) via [External Remote Services](https://attack.mitre.org/techniques/T1133)).\nTactics: ['reconnaissance']\nPlatforms: ['PRE']\n-----------------",
+        "retrieved_cve": "No relevant CVE information found in the alert.",
+        "validation": {
+            "mitre_evaluations": [
+                {
+                    "item_id": "T1098.004",
+                    "relevance_score": 0.3,
+                    "explanation": "The alert shows a successful SSH login using a public key. While this technique describes how keys are managed, the alert itself is a standard authentication event, not evidence of unauthorized modification of authorized_keys.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1110.004",
+                    "relevance_score": 0.1,
+                    "explanation": "This is a successful authentication event, not a credential stuffing attack. There is no indication of multiple failed attempts or automated brute-forcing.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1563.001",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of session hijacking; this is a standard, successful SSH login.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1133",
+                    "relevance_score": 0.2,
+                    "explanation": "While SSH is a remote service, this alert represents a legitimate or expected authentication event rather than an adversary leveraging external services for initial access.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1021.004",
+                    "relevance_score": 0.8,
+                    "explanation": "The alert explicitly documents an SSH login event. This technique is highly relevant as it describes the use of SSH for remote access, which is exactly what occurred in the log.",
+                    "decision": true,
+                    "data": "Technique ID: T1021.004 Name: SSH Description: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into remote machines using Secure Shell (SSH). The adversary may then perform actions as the logged-on user."
+                },
+                {
+                    "item_id": "T1110.003",
+                    "relevance_score": 0.1,
+                    "explanation": "The alert shows a single successful login, not a password spraying attempt.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1078.001",
+                    "relevance_score": 0.4,
+                    "explanation": "The alert shows a login as 'root'. While this is a default account, the alert does not provide evidence of abuse, only that the login was successful.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1110",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of brute force activity in the provided log.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1563",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of session hijacking.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1589.002",
+                    "relevance_score": 0.0,
+                    "explanation": "This technique is completely unrelated to the SSH authentication event.",
+                    "decision": false,
+                    "data": ""
+                }
+            ],
+            "cve_evaluations": []
+        },
+        "real_ttps": [
+            "T1078",
+            "T1021"
+        ],
+        "predicted_ttps": [
+            "T1021.004"
+        ],
+        "real_cves": [],
+        "predicted_cves": []
+    },
+    {
+        "original_alert": {
+            "timestamp": "2025-09-22T18:51:01.061+0000",
+            "rule": {
+                "level": 3,
+                "description": "PAM: Login session opened.",
+                "id": "5501",
+                "firedtimes": 1,
+                "mail": false,
+                "groups": [
+                    "pam",
+                    "syslog",
+                    "authentication_success"
+                ],
+                "pci_dss": [
+                    "10.2.5"
+                ],
+                "gpg13": [
+                    "7.8",
+                    "7.9"
+                ],
+                "gdpr": [
+                    "IV_32.2"
+                ],
+                "hipaa": [
+                    "164.312.b"
+                ],
+                "nist_800_53": [
+                    "AU.14",
+                    "AC.7"
+                ],
+                "tsc": [
+                    "CC6.8",
+                    "CC7.2",
+                    "CC7.3"
+                ]
+            },
+            "agent": {
+                "id": "002",
+                "name": "videoserver",
+                "ip": "172.17.100.121"
+            },
+            "manager": {
+                "name": "wazuh"
+            },
+            "id": "1758567061.11561209",
+            "full_log": "Sep 22 18:51:00 videoserver sshd[17243]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)",
+            "predecoder": {
+                "program_name": "sshd",
+                "timestamp": "Sep 22 18:51:00",
+                "hostname": "videoserver"
+            },
+            "decoder": {
+                "parent": "pam",
+                "name": "pam"
+            },
+            "data": {
+                "dstuser": "root(uid=0)",
+                "uid": "0"
+            },
+            "location": "journald"
+        },
+        "mitre": {
+            "search": true,
+            "description": "The alert indicates a successful SSH login session opened for the root user on the host videoserver. This behavior relates to the use of valid accounts to access systems, specifically administrative access via SSH.",
+            "keywords": "Valid Accounts, SSH, Root Login"
+        },
+        "cve": {
+            "search": false,
+            "description": "",
+            "keywords": ""
+        },
+        "retrieved_mitre": "MITRE results:\nTechnique ID: T1563\nName: Remote Service Session Hijacking\nDescription: Adversaries may take control of preexisting sessions with remote services to move laterally in an environment. Users may use valid credentials to log into a service specifically designed to accept remote connections, such as telnet, SSH, and RDP. When a user logs into a service, a session will be established that will allow them to maintain a continuous interaction with that service.\n\nAdversaries may commandeer these sessions to carry out actions on remote systems. [Remote Service Session Hijacking](https://attack.mitre.org/techniques/T1563) differs from use of [Remote Services](https://attack.mitre.org/techniques/T1021) because it hijacks an existing session rather than creating a new session using [Valid Accounts](https://attack.mitre.org/techniques/T1078).(Citation: RDP Hijacking Medium)(Citation: Breach Post-mortem SSH Hijack)\nTactics: ['lateral-movement']\nPlatforms: ['Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1563.001\nName: SSH Hijacking\nDescription: Adversaries may hijack a legitimate user's SSH session to move laterally within an environment. Secure Shell (SSH) is a standard means of remote access on Linux and macOS systems. It allows a user to connect to another system via an encrypted tunnel, commonly authenticating through a password, certificate or the use of an asymmetric encryption key pair.\n\nIn order to move laterally from a compromised host, adversaries may take advantage of trust relationships established with other systems via public key authentication in active SSH sessions by hijacking an existing connection to another system. This may occur through compromising the SSH agent itself or by having access to the agent's socket. If an adversary is able to obtain root access, then hijacking SSH sessions is likely trivial.(Citation: Slideshare Abusing SSH)(Citation: SSHjack Blackhat)(Citation: Clockwork SSH Agent Hijacking)(Citation: Breach Post-mortem SSH Hijack)\n\n[SSH Hijacking](https://attack.mitre.org/techniques/T1563/001) differs from use of [SSH](https://attack.mitre.org/techniques/T1021/004) because it hijacks an existing SSH session rather than creating a new session using [Valid Accounts](https://attack.mitre.org/techniques/T1078).\nTactics: ['lateral-movement']\nPlatforms: ['Linux', 'macOS']\n-----------------\nTechnique ID: T1021\nName: Remote Services\nDescription: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into a service that accepts remote connections, such as telnet, SSH, and VNC. The adversary may then perform actions as the logged-on user.\n\nIn an enterprise environment, servers and workstations can be organized into domains. Domains provide centralized identity management, allowing users to login using one set of credentials across the entire network. If an adversary is able to obtain a set of valid domain credentials, they could login to many different machines using remote access protocols such as secure shell (SSH) or remote desktop protocol (RDP).(Citation: SSH Secure Shell)(Citation: TechNet Remote Desktop Services) They could also login to accessible SaaS or IaaS services, such as those that federate their identities to the domain, or management platforms for internal virtualization environments such as VMware vCenter. \n\nLegitimate applications (such as [Software Deployment Tools](https://attack.mitre.org/techniques/T1072) and other administrative programs) may utilize [Remote Services](https://attack.mitre.org/techniques/T1021) to access remote hosts. For example, Apple Remote Desktop (ARD) on macOS is native software used for remote management. ARD leverages a blend of protocols, including [VNC](https://attack.mitre.org/techniques/T1021/005) to send the screen and control buffers and [SSH](https://attack.mitre.org/techniques/T1021/004) for secure file transfer.(Citation: Remote Management MDM macOS)(Citation: Kickstart Apple Remote Desktop commands)(Citation: Apple Remote Desktop Admin Guide 3.3) Adversaries can abuse applications such as ARD to gain remote code execution and perform lateral movement. In versions of macOS prior to 10.14, an adversary can escalate an SSH session to an ARD session which enables an adversary to accept TCC (Transparency, Consent, and Control) prompts without user interaction and gain access to data.(Citation: FireEye 2019 Apple Remote Desktop)(Citation: Lockboxx ARD 2019)(Citation: Kickstart Apple Remote Desktop commands)\nTactics: ['lateral-movement']\nPlatforms: ['Linux', 'macOS', 'Windows', 'IaaS', 'ESXi']\n-----------------\nTechnique ID: T1078\nName: Valid Accounts\nDescription: Adversaries may obtain and abuse credentials of existing accounts as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Compromised credentials may be used to bypass access controls placed on various resources on systems within the network and may even be used for persistent access to remote systems and externally available services, such as VPNs, Outlook Web Access, network devices, and remote desktop.(Citation: volexity_0day_sophos_FW) Compromised credentials may also grant an adversary increased privilege to specific systems or access to restricted areas of the network. Adversaries may choose not to use malware or tools in conjunction with the legitimate access those credentials provide to make it harder to detect their presence.\n\nIn some cases, adversaries may abuse inactive accounts: for example, those belonging to individuals who are no longer part of an organization. Using these accounts may allow the adversary to evade detection, as the original account user will not be present to identify any anomalous activity taking place on their account.(Citation: CISA MFA PrintNightmare)\n\nThe overlap of permissions for local, domain, and cloud accounts across a network of systems is of concern because the adversary may be able to pivot across accounts and systems to reach a high level of access (i.e., domain or enterprise administrator) to bypass access controls set within the enterprise.(Citation: TechNet Credential Theft)\nTactics: ['stealth', 'persistence', 'privilege-escalation', 'initial-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1021.004\nName: SSH\nDescription: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into remote machines using Secure Shell (SSH). The adversary may then perform actions as the logged-on user.\n\nSSH is a protocol that allows authorized users to open remote shells on other computers. Many Linux and macOS versions come with SSH installed by default, although typically disabled until the user enables it. On ESXi, SSH can be enabled either directly on the host (e.g., via `vim-cmd hostsvc/enable_ssh`) or via vCenter.(Citation: Sygnia ESXi Ransomware 2025)(Citation: TrendMicro ESXI Ransomware)(Citation: Sygnia Abyss Locker 2025) The SSH server can be configured to use standard password authentication or public-private keypairs in lieu of or in addition to a password. In this authentication scenario, the user’s public key must be in a special file on the computer running the server that lists which keypairs are allowed to login as that user (i.e., [SSH Authorized Keys](https://attack.mitre.org/techniques/T1098/004)).\nTactics: ['lateral-movement']\nPlatforms: ['ESXi', 'Linux', 'macOS']\n-----------------\nTechnique ID: T1098.004\nName: SSH Authorized Keys\nDescription: Adversaries may modify the SSH <code>authorized_keys</code> file to maintain persistence on a victim host. Linux distributions, macOS, and ESXi hypervisors commonly use key-based authentication to secure the authentication process of SSH sessions for remote management. The <code>authorized_keys</code> file in SSH specifies the SSH keys that can be used for logging into the user account for which the file is configured. This file is usually found in the user's home directory under <code>&lt;user-home&gt;/.ssh/authorized_keys</code> (or, on ESXi, `/etc/ssh/keys-<username>/authorized_keys`).(Citation: SSH Authorized Keys) Users may edit the system’s SSH config file to modify the directives `PubkeyAuthentication` and `RSAAuthentication` to the value `yes` to ensure public key and RSA authentication are enabled, as well as modify the directive `PermitRootLogin` to the value `yes` to enable root authentication via SSH.(Citation: Broadcom ESXi SSH) The SSH config file is usually located under <code>/etc/ssh/sshd_config</code>.\n\nAdversaries may modify SSH <code>authorized_keys</code> files directly with scripts or shell commands to add their own adversary-supplied public keys. In cloud environments, adversaries may be able to modify the SSH authorized_keys file of a particular virtual machine via the command line interface or rest API. For example, by using the Google Cloud CLI’s “add-metadata” command an adversary may add SSH keys to a user account.(Citation: Google Cloud Add Metadata)(Citation: Google Cloud Privilege Escalation) Similarly, in Azure, an adversary may update the authorized_keys file of a virtual machine via a PATCH request to the API.(Citation: Azure Update Virtual Machines) This ensures that an adversary possessing the corresponding private key may log in as an existing user via SSH.(Citation: Venafi SSH Key Abuse)(Citation: Cybereason Linux Exim Worm) It may also lead to privilege escalation where the virtual machine or instance has distinct permissions from the requesting user.\n\nWhere authorized_keys files are modified via cloud APIs or command line interfaces, an adversary may achieve privilege escalation on the target virtual machine if they add a key to a higher-privileged user. \n\nSSH keys can also be added to accounts on network devices, such as with the `ip ssh pubkey-chain` [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) command.(Citation: cisco_ip_ssh_pubkey_ch_cmd)\nTactics: ['persistence', 'privilege-escalation']\nPlatforms: ['ESXi', 'IaaS', 'Linux', 'macOS', 'Network Devices']\n-----------------\nTechnique ID: T1546.004\nName: Unix Shell Configuration Modification\nDescription: Adversaries may establish persistence through executing malicious commands triggered by a user’s shell. User [Unix Shell](https://attack.mitre.org/techniques/T1059/004)s execute several configuration scripts at different points throughout the session based on events. For example, when a user opens a command-line interface or remotely logs in (such as via SSH) a login shell is initiated. The login shell executes scripts from the system (<code>/etc</code>) and the user’s home directory (<code>~/</code>) to configure the environment. All login shells on a system use /etc/profile when initiated. These configuration scripts run at the permission level of their directory and are often used to set environment variables, create aliases, and customize the user’s environment. When the shell exits or terminates, additional shell scripts are executed to ensure the shell exits appropriately. \n\nAdversaries may attempt to establish persistence by inserting commands into scripts automatically executed by shells. Using bash as an example, the default shell for most GNU/Linux systems, adversaries may add commands that launch malicious binaries into the <code>/etc/profile</code> and <code>/etc/profile.d</code> files.(Citation: intezer-kaiji-malware)(Citation: bencane blog bashrc) These files typically require root permissions to modify and are executed each time any shell on a system launches. For user level permissions, adversaries can insert malicious commands into <code>~/.bash_profile</code>, <code>~/.bash_login</code>, or <code>~/.profile</code> which are sourced when a user opens a command-line interface or connects remotely.(Citation: anomali-rocke-tactics)(Citation: Linux manual bash invocation) Since the system only executes the first existing file in the listed order, adversaries have used <code>~/.bash_profile</code> to ensure execution. Adversaries have also leveraged the <code>~/.bashrc</code> file which is additionally executed if the connection is established remotely or an additional interactive shell is opened, such as a new tab in the command-line interface.(Citation: Tsunami)(Citation: anomali-rocke-tactics)(Citation: anomali-linux-rabbit)(Citation: Magento) Some malware targets the termination of a program to trigger execution, adversaries can use the <code>~/.bash_logout</code> file to execute malicious commands at the end of a session. \n\nFor macOS, the functionality of this technique is similar but may leverage zsh, the default shell for macOS 10.15+. When the Terminal.app is opened, the application launches a zsh login shell and a zsh interactive shell. The login shell configures the system environment using <code>/etc/profile</code>, <code>/etc/zshenv</code>, <code>/etc/zprofile</code>, and <code>/etc/zlogin</code>.(Citation: ScriptingOSX zsh)(Citation: PersistentJXA_leopitt)(Citation: code_persistence_zsh)(Citation: macOS MS office sandbox escape) The login shell then configures the user environment with <code>~/.zprofile</code> and <code>~/.zlogin</code>. The interactive shell uses the <code>~/.zshrc</code> to configure the user environment. Upon exiting, <code>/etc/zlogout</code> and <code>~/.zlogout</code> are executed. For legacy programs, macOS executes <code>/etc/bashrc</code> on startup.\nTactics: ['privilege-escalation', 'persistence']\nPlatforms: ['Linux', 'macOS']\n-----------------\nTechnique ID: T1133\nName: External Remote Services\nDescription: Adversaries may leverage external-facing remote services to initially access and/or persist within a network. Remote services such as VPNs, Citrix, and other access mechanisms allow users to connect to internal enterprise network resources from external locations. There are often remote service gateways that manage connections and credential authentication for these services. Services such as [Windows Remote Management](https://attack.mitre.org/techniques/T1021/006) and [VNC](https://attack.mitre.org/techniques/T1021/005) can also be used externally.(Citation: MacOS VNC software for Remote Desktop)\n\nAccess to [Valid Accounts](https://attack.mitre.org/techniques/T1078) to use the service is often a requirement, which could be obtained through credential pharming or by obtaining the credentials from users after compromising the enterprise network.(Citation: Volexity Virtual Private Keylogging) Access to remote services may be used as a redundant or persistent access mechanism during an operation.\n\nAccess may also be gained through an exposed service that doesn’t require authentication. In containerized environments, this may include an exposed Docker API, Kubernetes API server, kubelet, or web application such as the Kubernetes dashboard.(Citation: Trend Micro Exposed Docker Server)(Citation: Unit 42 Hildegard Malware)\n\nAdversaries may also establish persistence on network by configuring a Tor hidden service on a compromised system. Adversaries may utilize the tool `ShadowLink` to facilitate the installation and configuration of the Tor hidden service. Tor hidden service is then accessible via the Tor network because `ShadowLink` sets up a .onion address on the compromised system. `ShadowLink` may be used to forward any inbound connections to RDP, allowing the adversaries to have remote access.(Citation: The BadPilot campaign) Adversaries may get `ShadowLink` to persist on a system by masquerading it as an MS Defender application.(Citation: Russian threat actors dig in, prepare to seize on war fatigue)\nTactics: ['persistence', 'initial-access']\nPlatforms: ['Containers', 'Linux', 'macOS', 'Windows']\n-----------------\nTechnique ID: T1110\nName: Brute Force\nDescription: Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained.(Citation: TrendMicro Pawn Storm Dec 2020) Without knowledge of the password for an account or set of accounts, an adversary may systematically guess the password using a repetitive or iterative mechanism.(Citation: Dragos Crashoverride 2018) Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials or offline against previously acquired credential data, such as password hashes.\n\nBrute forcing credentials may take place at various points during a breach. For example, adversaries may attempt to brute force access to [Valid Accounts](https://attack.mitre.org/techniques/T1078) within a victim environment leveraging knowledge gathered from other post-compromise behaviors such as [OS Credential Dumping](https://attack.mitre.org/techniques/T1003), [Account Discovery](https://attack.mitre.org/techniques/T1087), or [Password Policy Discovery](https://attack.mitre.org/techniques/T1201). Adversaries may also combine brute forcing activity with behaviors such as [External Remote Services](https://attack.mitre.org/techniques/T1133) as part of Initial Access. \n\nIf an adversary guesses the correct password but fails to login to a compromised account due to location-based conditional access policies, they may change their infrastructure until they match the victim’s location and therefore bypass those policies.(Citation: ReliaQuest Health Care Social Engineering Campaign 2024)\nTactics: ['credential-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------\nTechnique ID: T1078.001\nName: Default Accounts\nDescription: Adversaries may obtain and abuse credentials of a default account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Default accounts are those that are built-into an OS, such as the Guest or Administrator accounts on Windows systems. Default accounts also include default factory/provider set accounts on other types of systems, software, or devices, including the root user account in AWS, the root user account in ESXi, and the default service account in Kubernetes.(Citation: Microsoft Local Accounts Feb 2019)(Citation: AWS Root User)(Citation: Threat Matrix for Kubernetes)\n\nDefault accounts are not limited to client machines; rather, they also include accounts that are preset for equipment such as network devices and computer applications, whether they are internal, open source, or commercial. Appliances that come preset with a username and password combination pose a serious threat to organizations that do not change it post installation, as they are easy targets for an adversary. Similarly, adversaries may also utilize publicly disclosed or stolen [Private Keys](https://attack.mitre.org/techniques/T1552/004) or credential materials to legitimately connect to remote environments via [Remote Services](https://attack.mitre.org/techniques/T1021).(Citation: Metasploit SSH Module)\n\nDefault accounts may be created on a system after initial setup by connecting or integrating it with another application. For example, when an ESXi server is connected to a vCenter server, a default privileged account called `vpxuser` is created on the ESXi server. If a threat actor is able to compromise this account’s credentials (for example, via [Exploitation for Credential Access](https://attack.mitre.org/techniques/T1212) on the vCenter host), they will then have access to the ESXi server.(Citation: Google Cloud Threat Intelligence VMWare ESXi Zero-Day 2023)(Citation: Pentera vCenter Information Disclosure)\nTactics: ['stealth', 'persistence', 'privilege-escalation', 'initial-access']\nPlatforms: ['Containers', 'ESXi', 'IaaS', 'Identity Provider', 'Linux', 'macOS', 'Network Devices', 'Office Suite', 'SaaS', 'Windows']\n-----------------",
+        "retrieved_cve": "No relevant CVE information found in the alert.",
+        "validation": {
+            "mitre_evaluations": [
+                {
+                    "item_id": "T1563",
+                    "relevance_score": 0.2,
+                    "explanation": "The alert indicates a successful SSH login, not a session hijacking event. While SSH is involved, there is no evidence of hijacking an existing session.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1563.001",
+                    "relevance_score": 0.2,
+                    "explanation": "Similar to T1563, this refers to hijacking an existing SSH session. The alert shows a standard session opening, not a hijack.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1021",
+                    "relevance_score": 0.6,
+                    "explanation": "The alert describes a remote login via SSH, which falls under the broad category of Remote Services. It is relevant as a classification of the activity.",
+                    "decision": true,
+                    "data": "Technique ID: T1021 Name: Remote Services Description: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into a service that accepts remote connections, such as telnet, SSH, and VNC. The adversary may then perform actions as the logged-on user."
+                },
+                {
+                    "item_id": "T1078",
+                    "relevance_score": 0.5,
+                    "explanation": "The alert shows a successful login, which implies the use of valid credentials. However, without further context of malicious intent, this is just a standard authentication event.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1021.004",
+                    "relevance_score": 0.9,
+                    "explanation": "The alert explicitly logs an SSH session opening. This technique is highly relevant as it describes the specific protocol and method used in the alert.",
+                    "decision": true,
+                    "data": "Technique ID: T1021.004 Name: SSH Description: Adversaries may use [Valid Accounts](https://attack.mitre.org/techniques/T1078) to log into remote machines using Secure Shell (SSH). The adversary may then perform actions as the logged-on user."
+                },
+                {
+                    "item_id": "T1098.004",
+                    "relevance_score": 0.1,
+                    "explanation": "This technique relates to persistence via SSH keys. There is no indication in the alert that keys were modified or that persistence is being established.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1546.004",
+                    "relevance_score": 0.1,
+                    "explanation": "This relates to shell configuration modification for persistence. No evidence of this is present in the alert.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1133",
+                    "relevance_score": 0.2,
+                    "explanation": "This refers to external-facing remote services for initial access. While SSH is a remote service, the alert does not specify if it was external or internal, and there is no evidence of malicious access.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1110",
+                    "relevance_score": 0.1,
+                    "explanation": "There is no evidence of brute force activity in the alert; it is a single successful login event.",
+                    "decision": false,
+                    "data": ""
+                },
+                {
+                    "item_id": "T1078.001",
+                    "relevance_score": 0.3,
+                    "explanation": "The alert shows a root login. While this could involve a default account, it is a common administrative action. Without further context, it is speculative.",
+                    "decision": false,
+                    "data": ""
+                }
+            ],
+            "cve_evaluations": []
+        },
+        "real_ttps": [
+            "T1078"
+        ],
+        "predicted_ttps": [
+            "T1021",
+            "T1021.004"
+        ],
+        "real_cves": [],
+        "predicted_cves": []
+    }]

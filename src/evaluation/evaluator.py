@@ -10,8 +10,9 @@ class EvaluationRunner:
         self.data_saver = data_saver
         self.config = config
         self.evaluation_id = f"EVAL-{uuid.uuid4().hex[:6].upper()}"
+        self.evaluation_debug = []
 
-    def run_evaluation(self, dataset_df, dataset_name: str):
+    def run_evaluation(self, dataset_df, dataset_name: str, debug: bool):
         print(f"🚀 Iniciando Evaluación: {self.evaluation_id}")
         
         total_alerts = 0
@@ -42,7 +43,7 @@ class EvaluationRunner:
             real_cves = alert_data.get('real_cves', [])
             
             # Guardar informe físico y coger la ruta
-            report_path = f"reports/report_{row['alert_id']}.md" if self.config.generate_report else None
+            report_path = f"reports/{self.evaluation_id}_report_{row['alert_id']}.md" if self.config.generate_report else None
             
             # 3. CREAR LOG DE ALERTA
             alert_log = AlertLog(
@@ -81,6 +82,28 @@ class EvaluationRunner:
                 if any(ttp in real_parents for ttp in predicted_parents):
                     aciertos_mitre += 1
 
+            if debug:
+                self.evaluation_debug.append({
+                    'original_alert': alert_data,
+                    'mitre': {
+                        'search': final_state.get('classification').mitre_search,
+                        'description': final_state.get('classification').mitre_description,
+                        'keywords': final_state.get('classification').mitre_keywords
+                    },
+                    'cve': {
+                        'search': final_state.get('classification').cve_search,
+                        'description': final_state.get('classification').cve_description,
+                        'keywords': final_state.get('classification').cve_keywords
+                    },
+                    'retrieved_mitre': final_state.get('mitre_data'),
+                    'retrieved_cve': final_state.get('cve_data'),
+                    'validation': val_report.model_dump(),
+                    'real_ttps': real_ttps,
+                    'predicted_ttps': predicted_ttps,
+                    'real_cves': real_cves,
+                    'predicted_cves': predicted_cves
+                })
+
                     
 
         # 4. CREAR RESULTADO GLOBAL
@@ -103,4 +126,7 @@ class EvaluationRunner:
         )
         
         self.data_saver.save_evaluation_result(eval_result)
+        if debug:
+            with open(f'notes/{self.evaluation_id}_debug.json', 'w', encoding='utf-8') as file:
+                json.dump(self.evaluation_debug, file, indent=4, ensure_ascii=False)
         print("✅ Evaluación finalizada.")

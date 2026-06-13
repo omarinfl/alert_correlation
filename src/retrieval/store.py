@@ -98,3 +98,26 @@ class ElasticSearchVectorStore(VectorStore):
         
         response = self.client.search(index=self.index_name, body=query)
         return [hit['_source'] for hit in response['hits']['hits']]
+    
+    def search_mitre_hybrid_simple(self, query_vector, query_text, top_k=5, knn_boost=0.6, bm25_boost=0.4):
+        query = {
+                "size": top_k,
+                "knn": {
+                    "field": "vector",
+                    "query_vector": query_vector,
+                    "k": top_k,
+                    "num_candidates": 100,
+                    "boost": knn_boost
+                },
+                "query": {
+                        "match": {
+                            "text_to_search": {
+                                "query": query_text,
+                                "boost": bm25_boost
+                            }
+                        }        
+                }
+        }
+        
+        response = self.client.search(index=self.index_name, body=query)
+        return [hit['_source'] for hit in response['hits']['hits']]

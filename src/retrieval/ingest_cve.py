@@ -102,7 +102,12 @@ def extract_ssvc(metrics):
     return {"Explotation": None, "Automatable": None, "Technical Impact": None}
 
 def process_cve(cve_json, kev_cves):
+    
     metadata = cve_json.get('cveMetadata', {})
+    
+    # Versión rápida para evitar indexar 150k (solo kev)
+    if not metadata.get('cveId', '') in kev_cves:
+       return None
     
     not_published = []
     if metadata.get('state') != 'PUBLISHED':
@@ -120,18 +125,15 @@ def process_cve(cve_json, kev_cves):
     metrics = cna.get('metrics', []) + adp_metrics
     cvss = extract_cvss(metrics)
     if not in_kev:
-        # print(f"{cve_id} no está en el KEV.")
         cve_year = int(cve_id.split('-')[1]) if '-' in cve_id else 0
 
         if cvss['score'] < MIN_CVSS_SCORE and cve_year < ALL_YEAR:
-            # print(f"{cve_id} es un CVE de baja criticidad y no es reciente.")
             return None
     
     kev_json = kev_cves.get(cve_id, {})
     references = cna.get('references', []) + adp_references
 
     kev_mitigation = kev_json.get('requiredAction', None)
-    # cve_mitigations = f'Consultar las referencias: {", ".join([r["url"] for r in cna.get("references", []) if "mitigation" in r.get("tags", []) or "patch" in r.get("tags", [])])}'
     cve_mitigations = [r["url"] for r in references if "mitigation" in r.get("tags", []) or "patch" in r.get("tags", [])]
     cve_mitigations = f'Consultar las referencias: {", ".join(cve_mitigations)}' if len(cve_mitigations) > 0 else 'Not mitigations found in references.'
     
@@ -158,8 +160,8 @@ def process_cve(cve_json, kev_cves):
 
 def main():
     print("Inicializando módulos...")
-    embedder = SentenceTransformerEmbedder()
-    vector_store = ElasticSearchVectorStore(index_name='cve_index')
+    embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
+    vector_store = ElasticSearchVectorStore(index_name='kev_cve_index_bge')
 
     print("Preparando la base de datos...")
     cve_columns = {
@@ -207,8 +209,9 @@ def main():
                 if not doc:
                     continue
 
-                text_to_embed = f"{doc['title']} {doc['description']}"
+                text_to_embed = f"Vulnerability {doc['id']}: {doc['title']}. {doc['description']}. Affected products: {' | '.join([f'Vendor: {v}, Product: {p}' for v,p in doc['affected_products']])}"
                 doc['vector'] = embedder.embed_query(text_to_embed)
+                doc['text_to_search'] = text_to_embed
                 documents.append(doc)
 
             if len(documents) >= 1000:
@@ -218,7 +221,7 @@ def main():
 
     if documents:
         vector_store.add_documents(documents)
-        print(f"{len(documents)} Documentos añadidos a la base de datoss...")
+        print(f"{len(documents)} Documentos añadidos a la base de datos...")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ data/cvelistV5-main.zip
 
 # Dataset de manifestaciones y CSV
 data/manifestations_raw
-data/alerts_dataset.csv
+data/alerts_dataset*.csv
 
 # Informes finales generados
 reports/

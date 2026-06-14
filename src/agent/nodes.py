@@ -50,7 +50,7 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
         '''Node that performs MITRE search if mitre_search is True.'''
 
         if not state['classification'].mitre_search:
-            return {'mitre_data': 'No relevant MITRE information found in the alert.'}
+            return {'mitre_data': {}}
         
         tracker.set_current_node('mitre_search_node')
         start_time = time.time()
@@ -59,21 +59,23 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
         desc = state['classification'].mitre_description
         query = state['classification'].mitre_keywords
         query_vector = embedder.embed_query(prefix + query)
-        # results = mitre_store.search(query_vector, top_k=config.mitre_top_k, 
-        #                             #  filter={'is_subtechnique': False}
-        #                              )
 
         results = mitre_store.search_mitre_hybrid_simple(query_vector, desc, top_k=config.mitre_top_k)
-
-        results_text = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
-                        f"Name: {r['name']}\n"
-                        f"Description: {r['description']}\n"
-                        f"Tactics: {r['tactics']}\n"
-                        f"Platforms: {r['platforms']}\n"
-                        "-----------------" for r in results])
         
+        cleaned_results = {
+            r.get('technique_id'): {
+                'technique_id': r.get('technique_id'),
+                'name': r.get('name'),
+                'description': r.get('description'),
+                'tactics': r.get('tactics'),
+                'platforms': r.get('platforms'),
+                'mitigations': r.get('mitigations'),
+                'detections': r.get('detections'),
+                'procedures': r.get('procedures')
+            } for r in results if r.get('technique_id')}
+    
         tracker.record_node_time('mitre_search_node', time.time() - start_time)
-        return {'mitre_data': results_text}
+        return {'mitre_data': cleaned_results}
     return mitre_search_node
 
 def make_cve_search_node(embedder, cve_store, tracker):
@@ -81,29 +83,36 @@ def make_cve_search_node(embedder, cve_store, tracker):
         '''Node that performs CVE search if cve_search is True.'''
 
         if not state['classification'].cve_search:
-            return {'cve_data': 'No relevant CVE information found in the alert.'}
+            return {'cve_data': {}}
 
         tracker.set_current_node('cve_search_node')
         start_time = time.time()
         
-        query = state['classification'].cve_description
-        query_vector = embedder.embed_query(query)
-        results = cve_store.search(query_vector, top_k=3)
-
-        results_text = 'CVE results:\n' + '\n'.join([f"CVE ID: {r['id']}\n"
-                        f"Title: {r['title']}\n"
-                        f"Description: {r['description']}\n"
-                        f"Published Date: {r['published_date']}\n"
-                        f"CVSS: {r['cvss']}\n"
-                        f"Affected Products: {r['versions']}\n"
-                        f"Mitigations: {r['mitigations']}\n"
-                        f"SSVC: {r['ssvc']}\n"
-                        f"References: {r['references']}\n"
-                        f"In KEV: {r['in_kev']}\n"
-                        "-----------------" for r in results])
+        prefix = "Represent this sentence for searching relevant passages: " # Para bge (asimétrico)
         
+        desc = state['classification'].cve_description
+        query = state['classification'].cve_keywords
+        query_vector = embedder.embed_query(prefix + query)
+        
+        results = cve_store.search_mitre_hybrid_simple(query_vector, desc, top_k=3)
+        
+        cleaned_results = {
+            r.get('id'): {
+                'cve_id': r.get('id'),
+                'title': r.get('title'),
+                'description': r.get('description'),
+                'published_date': r.get('published_date'),
+                'cvss': r.get('cvss'),
+                'versions': r.get('versions'),
+                'mitigations': r.get('mitigations'),
+                'ssvc': r.get('ssvc'),
+                'references': r.get('references'),
+                'in_kev': r.get('in_kev')
+            } for r in results if r.get('id') 
+        }
+ 
         tracker.record_node_time('cve_search_node', time.time() - start_time)
-        return {'cve_data': results_text}
+        return {'cve_data': cleaned_results}
     return cve_search_node
 
 def make_alert_context_node(config, alert_data, tracker):
@@ -135,6 +144,26 @@ def make_validation_node(llm, tracker):
         tracker.set_current_node('validation_node')
         start_time = time.time()
 
+        if state.get('mitre_data'):  
+            mitre_data = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
+                            f"Name: {r['name']}\n"
+                            f"Description: {r['description']}\n"
+                            f"Tactics: {r['tactics']}\n"
+                            f"Platforms: {r['platforms']}\n"
+                            "-----------------" for r in state['mitre_data'].values()]) 
+        else: 
+            mitre_data = 'No relevant MITRE information found in the alert.'
+        
+        if state.get('cve_data'): 
+            cve_data = 'CVE results:\n' + '\n'.join([f"CVE ID: {r['cve_id']}\n"
+                            f"Title: {r['title']}\n"
+                            f"Description: {r['description']}\n"
+                            f"Published Date: {r['published_date']}\n"
+                            f"Affected Products: {r['versions']}\n"
+                            "-----------------" for r in state['cve_data'].values()])
+        else:
+            cve_data = 'No relevant CVE information found in the alert.'
+
         prompt = f'''
         You are a SOC analyst. Your task is to evaluate the relevance of the retrieved MITRE techniques and CVE vulnerabilities from an automatic search system.
         You must evaluate if each result is actually relevant to the original alert or whether it is semantic noise (for example, a MITRE technique that shares some keywords with the alert but is not actually related to the attack described in the alert).
@@ -144,9 +173,9 @@ def make_validation_node(llm, tracker):
 
         CONTEXT WINDOW: {state['context_window']}
 
-        EXTRACTED MITRE RESULTS: {state['mitre_data']}
+        EXTRACTED MITRE RESULTS: {mitre_data}
         
-        EXTRACTED CVE RESULTS: {state['cve_data']}
+        EXTRACTED CVE RESULTS: {cve_data}
 
         INSTRUCTIONS:
         - Compare each technique and vulnerability with the original alert.
@@ -177,9 +206,52 @@ def make_final_report_node(config, llm, tracker):
         start_time = time.time()
 
         validated_data = state['validation_report']
-        validated_mitre = [e for e in validated_data.mitre_evaluations if e.decision]
-        validated_cve = [e for e in validated_data.cve_evaluations if e.decision]
-        
+
+        valid_mitre_evals = sorted(
+            [e for e in validated_data.mitre_evaluations if e.decision],
+            key=lambda x: x.relevance_score,
+            reverse=True
+        )
+
+        # validated_mitre = [e for e in validated_data.mitre_evaluations if e.decision]
+        validated_mitre = '\n'.join([
+            f"Technique ID: {e.item_id}\n"
+            f"Name: {state['mitre_data'][e.item_id]['name']}\n"
+            f"Description: {state['mitre_data'][e.item_id]['description']}\n"
+            f"Tactics: {state['mitre_data'][e.item_id]['tactics']}\n"
+            f"Platforms: {state['mitre_data'][e.item_id]['platforms']}\n"
+            f"Mitigations: {state['mitre_data'][e.item_id]['mitigations']}\n"
+            f"Confidence Score: {e.relevance_score}\n"
+            f"Explanation: {e.explanation}\n"
+            "-----------------" 
+            for e in valid_mitre_evals 
+            if e.item_id in state['mitre_data']
+        ])
+
+        valid_cve_evals = sorted(
+            [e for e in validated_data.cve_evaluations if e.decision],
+            key=lambda x: x.relevance_score,
+            reverse=True
+        )
+
+        validated_cve = '\n'.join([
+            f"CVE ID: {e.item_id}\n"
+            f"Title: {state['cve_data'][e.item_id].get('title')}\n"
+            f"Description: {state['cve_data'][e.item_id].get('description')}\n"
+            f"CVSS Score: {state['cve_data'][e.item_id].get('cvss')}\n"
+            f"SSVC Priority: {state['cve_data'][e.item_id].get('ssvc')}\n"
+            f"In CISA KEV (Known Exploited Vulnerability): {state['cve_data'][e.item_id].get('in_kev')}\n"
+            f"Affected Products/Versions: {state['cve_data'][e.item_id].get('versions')}\n"
+            f"Mitigations/Remediation: {state['cve_data'][e.item_id].get('mitigations')}\n"
+            f"References & Patches: {state['cve_data'][e.item_id].get('references')}\n"
+            f"Validador Confidence Score: {e.relevance_score}\n"
+            f"Validador Explanation: {e.explanation}\n"
+            "-----------------"
+            for e in valid_cve_evals
+            if e.item_id in state['cve_data']
+        ])
+
+
         prompt = f'''
         You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and its tactics and CVE vulnerabilities that have been identified.
         Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
@@ -210,5 +282,5 @@ def make_final_report_node(config, llm, tracker):
             
 
         tracker.record_node_time('final_report_node', time.time() - start_time)
-        return {'final_report': response.content[0]}
+        return {'final_report': report_text}
     return final_report_node

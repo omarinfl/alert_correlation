@@ -116,7 +116,8 @@ class ElasticSearchVectorStore(VectorStore):
                                 "boost": bm25_boost
                             }
                         }        
-                }
+                },
+                "_source": {"excludes": ["vector", "text_to_search"]},
         }
         
         response = self.client.search(index=self.index_name, body=query)

@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from src.models.models import AlertLog, EvaluationResult 
 import time
+import os
 
 class EvaluationRunner:
     def __init__(self, agent, data_saver, config: dict):
@@ -42,9 +43,18 @@ class EvaluationRunner:
             real_ttps = eval(row['real_ttps'])
             real_cves = alert_data.get('real_cves', [])
             
-            # Guardar informe físico y coger la ruta
+            # Guardar informe y la ruta
             report_path = f"reports/{self.evaluation_id}_report_{row['alert_id']}.md" if self.config.generate_report else None
-            
+            report_path = None
+            if self.config.generate_report and 'final_report' in final_state:
+                report_text = final_state['final_report']
+                
+                os.makedirs(self.config.report_dir, exist_ok=True)
+                report_path = f"reports/{self.evaluation_id}_report_{row['alert_id']}.md"
+                
+                with open(report_path, 'w', encoding='utf-8') as f:
+                    f.write(report_text)
+
             # 3. CREAR LOG DE ALERTA
             alert_log = AlertLog(
                 evaluation_id=self.evaluation_id,

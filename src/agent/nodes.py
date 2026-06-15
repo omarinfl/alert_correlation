@@ -103,6 +103,7 @@ def make_cve_search_node(embedder, cve_store, tracker):
                 'description': r.get('description'),
                 'published_date': r.get('published_date'),
                 'cvss': r.get('cvss'),
+                'affected_products': r.get('affected_products'),
                 'versions': r.get('versions'),
                 'mitigations': r.get('mitigations'),
                 'ssvc': r.get('ssvc'),
@@ -140,10 +141,19 @@ def make_validation_node(llm, tracker):
     def validation_node(state: AgentState) -> AgentState:
         '''Node that validates the relevance of the retrieved MITRE and CVE information.'''
         
-        print('Evaluando respuestas recuperadas...')
         tracker.set_current_node('validation_node')
         start_time = time.time()
 
+        if not state.get('mitre_data') and not state.get('cve_data'):
+            print('Búsqueda omitida por el clasificador. Saltando validación LLM...')
+            # Devolvemos un reporte vacío instantáneo sin llamar al LLM
+            empty_report = ValidationReport(mitre_evaluations=[], cve_evaluations=[])
+            tracker.record_node_time('validation_node', time.time() - start_time)
+            return {'validation_report': empty_report}
+
+        print('Evaluando respuestas recuperadas...')
+        
+        
         if state.get('mitre_data'):  
             mitre_data = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
                             f"Name: {r['name']}\n"
@@ -159,7 +169,7 @@ def make_validation_node(llm, tracker):
                             f"Title: {r['title']}\n"
                             f"Description: {r['description']}\n"
                             f"Published Date: {r['published_date']}\n"
-                            f"Affected Products: {r['versions']}\n"
+                            f"Affected Products: {r['affected_products']}\n"
                             "-----------------" for r in state['cve_data'].values()])
         else:
             cve_data = 'No relevant CVE information found in the alert.'
@@ -241,7 +251,7 @@ def make_final_report_node(config, llm, tracker):
             f"CVSS Score: {state['cve_data'][e.item_id].get('cvss')}\n"
             f"SSVC Priority: {state['cve_data'][e.item_id].get('ssvc')}\n"
             f"In CISA KEV (Known Exploited Vulnerability): {state['cve_data'][e.item_id].get('in_kev')}\n"
-            f"Affected Products/Versions: {state['cve_data'][e.item_id].get('versions')}\n"
+            f"Affected Products/Versions: {state['cve_data'][e.item_id].get('affected_products')}\n"
             f"Mitigations/Remediation: {state['cve_data'][e.item_id].get('mitigations')}\n"
             f"References & Patches: {state['cve_data'][e.item_id].get('references')}\n"
             f"Validador Confidence Score: {e.relevance_score}\n"
@@ -252,9 +262,41 @@ def make_final_report_node(config, llm, tracker):
         ])
 
 
+        # prompt = f'''
+        # You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and its tactics and CVE vulnerabilities that have been identified.
+        # Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
+        # '''
+        
         prompt = f'''
-        You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and its tactics and CVE vulnerabilities that have been identified.
-        Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
+        You are a Senior Tier 3 SOC Analyst. Your task is to generate a final incident report based on the provided alert, context, and validated threat intelligence.
+
+        Follow this STRICT MARKDOWN STRUCTURE exactly as outlined below:
+
+        # Incident Report: [Auto-generate a concise and descriptive title]
+
+        ## 1. Executive Summary
+        Provide a high-level summary of what occurred, identifying the affected host, the core action detected, and whether it represents an isolated anomaly or part of a broader attack.
+
+        ## 2. Incident Context
+        Analyze the 'Original Alert' alongside the 'CONTEXT WINDOW'. Explain the sequence of events. If the main alert is just an operational symptom (e.g., buffer full) caused by an attack in the context, explicitly state this relationship.
+
+        ## 3. Threat Intelligence Mapping
+        You MUST divide this into two strictly separate subsections:
+        
+        ### 3.1 Validated Evidence-Based Mapping (RAG)
+        ONLY list techniques or CVEs that are explicitly provided in the 'MITRE Information' or 'CVE Information' inputs. 
+        
+        STRICT ANTI-HALLUCINATION RULE: Do NOT invent, guess, or generate MITRE IDs (TXXXX) or CVEs. If the inputs are empty, you MUST write exactly: "No validated MITRE techniques or CVEs were matched by the correlation engine for this specific alert."
+
+        ### 3.2 AI Heuristic Proposals (Unverified)
+        If the RAG mapping is empty, or if you believe the Context Window strongly suggests an attack, use your AI knowledge to suggest 1 or 2 MITRE techniques that MIGHT apply. 
+        You MUST prefix this section with: "*Warning: These are AI inferences based on contextual behavior and have NOT been validated.*" Explain briefly why you suggest them based on the context.
+
+        ## 4. Assessment
+        Define the Severity (Low/Medium/High/Critical) and justify it based on the evidence. 
+
+        ## 5. Recommended Actions
+        Provide 3 to 4 highly actionable steps to contain, investigate, or remediate the specific threat.
         '''
 
         user_input = f'''
@@ -277,10 +319,6 @@ def make_final_report_node(config, llm, tracker):
         except:
             report_text = response.content # Formato locales
         
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write(report_text) 
-            
-
         tracker.record_node_time('final_report_node', time.time() - start_time)
         return {'final_report': report_text}
     return final_report_node

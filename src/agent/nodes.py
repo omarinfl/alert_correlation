@@ -280,23 +280,23 @@ def make_final_report_node(config, llm, tracker):
         ## 2. Incident Context
         Analyze the 'Original Alert' alongside the 'CONTEXT WINDOW'. Explain the sequence of events. If the main alert is just an operational symptom (e.g., buffer full) caused by an attack in the context, explicitly state this relationship.
 
-        ## 3. Threat Intelligence Mapping
+        ## 3. Threat Intelligence Correlation
         You MUST divide this into two strictly separate subsections:
         
         ### 3.1 Validated Evidence-Based Mapping (RAG)
-        ONLY list techniques or CVEs that are explicitly provided in the 'MITRE Information' or 'CVE Information' inputs. 
+        ONLY list techniques or CVEs that are explicitly provided in the 'MITRE Information' or 'CVE Information' inputs. Include a brief description of the technique or vulnerability, the tactic to which it belongs, as well as the rationale and evidence demonstrating why it correlates with the alert and the context. Try to base your response on the context provided.
         
         STRICT ANTI-HALLUCINATION RULE: Do NOT invent, guess, or generate MITRE IDs (TXXXX) or CVEs. If the inputs are empty, you MUST write exactly: "No validated MITRE techniques or CVEs were matched by the correlation engine for this specific alert."
 
         ### 3.2 AI Heuristic Proposals (Unverified)
-        If the RAG mapping is empty, or if you believe the Context Window strongly suggests an attack, use your AI knowledge to suggest 1 or 2 MITRE techniques that MIGHT apply. 
+        If the RAG mapping is empty, or if you believe the Context Window strongly suggests an attack, use your AI knowledge to suggest 1 or 2 MITRE techniques that MIGHT apply. Always focus on the analyzed alert and determine whether it could be a result of the actions in the context. If there is no evidence of possible malicious actions, classify the alert like NOISE.
         You MUST prefix this section with: "*Warning: These are AI inferences based on contextual behavior and have NOT been validated.*" Explain briefly why you suggest them based on the context.
 
         ## 4. Assessment
-        Define the Severity (Low/Medium/High/Critical) and justify it based on the evidence. 
+        Define the Severity (Low/Medium/High/Critical) and justify it based on the evidence. If provided, try to use severity scores of the CVEs predicted.
 
         ## 5. Recommended Actions
-        Provide 3 to 4 highly actionable steps to contain, investigate, or remediate the specific threat.
+        Provide highly actionable steps to contain, investigate, or remediate the specific threat. If provided, try to use the proposed mitigations in techniques and CVEs predicted.
         '''
 
         user_input = f'''
@@ -309,10 +309,6 @@ def make_final_report_node(config, llm, tracker):
         llm_with_tracker = llm.with_config(callbacks=[tracker])
 
         response = llm_with_tracker.invoke([SystemMessage(content=prompt), HumanMessage(content=user_input)])
-        alert_id = state['original_alert'].get('id', 'unknown_alert_id')
-        # Escribir en un archivo de texto el informe final
-        report_path = os.path.join(config.report_dir, f'final_report_{alert_id}.md')
-        os.makedirs(config.report_dir, exist_ok=True)
         
         try:
             report_text = response.content[0]['text'] # Formato Gemini

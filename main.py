@@ -35,20 +35,20 @@ def main():
     llm_creative = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2, seed=42)
 
     
-    # llm = ChatGoogleGenerativeAI(model='gemma-4-31b-it', api_key=API_KEY, temperature=0.2)
-#     llm = ChatOpenAI(
-#         model="gemma-4-26b-a4b",
-#         api_key='EMPTY',
-#         # streaming=True,
-#         # stream_usage=True,
-#         temperature=0.2,
-#         # max_tokens=None,
-#         # timeout=12000,
-#         # reasoning_effort="low",
-#         # max_retries=3,
-#         base_url="http://10.0.152.198:8003/v1",
-#         # http_client=httpx.Client(timeout=httpx.Timeout(connect=60.0, read=600.0, write=60.0, pool=60.0))
-# )
+    # llm_strict = ChatOpenAI(
+    #     model="gemma-4-26b-a4b",
+    #     api_key='EMPTY',
+    #     temperature=0.0,
+    #     base_url="http://10.0.152.198:8003/v1",
+    # )
+
+    # llm_creative = ChatOpenAI(
+    #     model="gemma-4-26b-a4b",
+    #     api_key='EMPTY',
+    #     temperature=0.2,
+    #     base_url="http://10.0.152.198:8003/v1",
+    # )
+
     # embedder = SentenceTransformerEmbedder()
     cve_store = ElasticSearchVectorStore(index_name='kev_cve_index_bge')
     # mitre_store = ElasticSearchVectorStore(index_name='mitre_attack')
@@ -62,8 +62,8 @@ def main():
     
     evaluator = EvaluationRunner(agent, data_saver, config)
 
+    # df = pd.read_csv('data/dataset_sintetico_cves.csv', parse_dates=['timestamp'])
     df = pd.read_csv('data/mini_dataset_parsed.csv', parse_dates=['timestamp'])
-    # df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
     alert = json.loads(df.iloc[8]['alert'])
     # key_path = ['rule', 'mitre']  
     # parent = alert
@@ -126,18 +126,18 @@ def main():
     #     },
     #     "location": "/opt/oracle/psft/cfg/webserv/peoplesoft/servers/PIA/logs/access.log"
     # }
-    
-    
-    # evaluator.run_evaluation(df, dataset_name='Unique Alerts', debug=True)
+
+    # evaluator.run_evaluation(df, dataset_name='CVE sintetico (15)', debug=True)
     final_state, _ = agent.process_alert(alert)
 
     report_text = final_state.get('final_report')
 
     if report_text:
-        alert_id = alert.get('id', 'unknown')
-        context = 'with_context' if config.use_context_window else 'without_context'
-        with open(f"reports/eval_{alert_id}_{context}.md", "w", encoding='utf-8') as f:
-            f.write(report_text)
+        # alert_id = alert.get('id', 'unknown')
+        # context = 'with_context' if config.use_context_window else 'without_context'
+        # with open(f"reports/eval_{alert_id}_{context}.md", "w", encoding='utf-8') as f:
+        #     f.write(report_text)
+        print(report_text)
     
 
 

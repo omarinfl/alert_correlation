@@ -4,6 +4,7 @@ from datetime import datetime
 from src.models.models import AlertLog, EvaluationResult 
 import time
 import os
+import ast
 
 class EvaluationRunner:
     def __init__(self, agent, data_saver, config: dict):
@@ -21,11 +22,11 @@ class EvaluationRunner:
         total_tokens = 0
         total_llm_calls = 0
         
-        # Contadores para precisión (simplificados)
         aciertos_mitre = 0
+        aciertos_cve = 0
         
         for index, row in dataset_df.iterrows():
-            alert_data = json.loads(row['alert']) 
+            alert_data = json.loads(row.get('alert', '{}')) 
             
             # 1. EJECUTAR AGENTE
             try:
@@ -40,17 +41,19 @@ class EvaluationRunner:
             predicted_ttps = [e.item_id for e in val_report.mitre_evaluations if e.decision] if val_report else []
             predicted_cves = [e.item_id for e in val_report.cve_evaluations if e.decision] if val_report else []
             
-            real_ttps = eval(row['real_ttps'])
-            real_cves = alert_data.get('real_cves', [])
+            real_ttps = ast.literal_eval(row.get('real_ttps', '[]'))
+            real_cves = ast.literal_eval(row.get('real_cves', '[]'))
+
+            alert_id = row.get('alert_id', 'unknown_id')
             
             # Guardar informe y la ruta
-            report_path = f"reports/{self.evaluation_id}_report_{row['alert_id']}.md" if self.config.generate_report else None
             report_path = None
             if self.config.generate_report and 'final_report' in final_state:
                 report_text = final_state['final_report']
                 
-                os.makedirs(self.config.report_dir, exist_ok=True)
-                report_path = f"reports/{self.evaluation_id}_report_{row['alert_id']}.md"
+                report_dir = f'{self.config.report_dir}/{self.evaluation_id}'
+                os.makedirs(report_dir, exist_ok=True)
+                report_path = f"{report_dir}/report_{alert_id}.md"
                 
                 with open(report_path, 'w', encoding='utf-8') as f:
                     f.write(report_text)
@@ -58,9 +61,9 @@ class EvaluationRunner:
             # 3. CREAR LOG DE ALERTA
             alert_log = AlertLog(
                 evaluation_id=self.evaluation_id,
-                alert_id=str(row['alert_id']),
-                alert_timestamp=row['timestamp'], 
-                alert_description=row['description'],
+                alert_id=str(alert_id),
+                alert_timestamp=row.get('timestamp',''), 
+                alert_description=row.get('description',''),
                 predicted_ttps=predicted_ttps,
                 predicted_cves=predicted_cves,
                 real_ttps=real_ttps,
@@ -92,6 +95,9 @@ class EvaluationRunner:
                 if any(ttp in real_parents for ttp in predicted_parents):
                     aciertos_mitre += 1
 
+            if any(cve in real_cves for cve in predicted_cves):
+                            aciertos_cve += 1          
+
             if debug:
                 self.evaluation_debug.append({
                     'original_alert': alert_data,
@@ -119,6 +125,7 @@ class EvaluationRunner:
         # 4. CREAR RESULTADO GLOBAL
         avg_time = total_time / total_alerts if total_alerts > 0 else 0
         mitre_acc = (aciertos_mitre / total_alerts) * 100 if total_alerts > 0 else 0
+        cve_acc = (aciertos_cve / total_alerts) * 100 if total_alerts > 0 else 0
         
         eval_result = EvaluationResult(
             evaluation_id=self.evaluation_id,
@@ -128,7 +135,7 @@ class EvaluationRunner:
             #                   "embedder": self.agent.embedder.__class__.__name.__},
             alerts_evaluated=total_alerts,
             mitre_accuracy=mitre_acc,
-            cve_accuracy=0.0, # Implementar tu lógica
+            cve_accuracy=cve_acc,
             total_accuracy=mitre_acc,
             avg_time=round(avg_time, 2),
             avg_tokens=round(total_tokens / total_alerts, 2) if total_alerts > 0 else 0,

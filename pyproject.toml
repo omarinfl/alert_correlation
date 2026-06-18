@@ -12,6 +12,7 @@ dependencies = [
     "langchain-ollama>=1.1.0",
     "langchain-openai>=1.2.2",
     "langsmith>=0.7.32",
+    "matplotlib>=3.11.0",
     "mitreattack-python>=5.4.5",
     "ollama>=0.6.1",
     "sentence-transformers>=5.4.1",

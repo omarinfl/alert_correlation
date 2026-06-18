@@ -20,12 +20,18 @@ class CSVAlertData(AlertData):
             self._df = pd.read_csv(self.csv_path, parse_dates=['timestamp'])
         return self._df
     
-    def get_context_window(self, original_alert: Dict[str, Any], window_size: int) -> List[Dict[str, Any]]:
+    def get_context_window(self, original_alert: Dict[str, Any], context_mode: str, window_size: int) -> List[Dict[str, Any]]:
         df = self.df
         df.sort_values(by='timestamp', inplace=True)
         alert_time = pd.to_datetime(original_alert['timestamp'])
-        previous_alerts = df[df['timestamp'] < alert_time].tail(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
-        subsequent_alerts = df[df['timestamp'] > alert_time].head(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
+        if context_mode == 'AROUND':
+            previous_alerts = df[df['timestamp'] < alert_time].tail(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
+            subsequent_alerts = df[df['timestamp'] > alert_time].head(window_size//2)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
 
-        context_window = previous_alerts.to_dict(orient='records') + subsequent_alerts.to_dict(orient='records')
+            context_window = previous_alerts.to_dict(orient='records') + subsequent_alerts.to_dict(orient='records')
+        elif context_mode == 'PAST':
+            previous_alerts = df[df['timestamp'] < alert_time].tail(window_size)[['timestamp', 'level', 'description', 'fired_times', 'full_log']]
+            
+            context_window = previous_alerts.to_dict(orient='records')
+            
         return context_window

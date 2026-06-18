@@ -1,9 +1,11 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 
 class AgentConfig(BaseModel):
     use_context_window: bool = Field(default=True, description="Whether to use a context window for alert evaluation")
     context_window_size: int = Field(default=10, description="Number of alerts to include in the context window")
-
+    context_mode: Literal['PAST', 'AROUND'] = Field(default='AROUND', description="Direction of the context window: 'PAST' (only previous alerts) or 'AROUND' (previous and next)")
+    
     generate_report: bool = Field(default=True, description="Whether to generate a final report after processing the alert")
     report_dir: str = Field(default='reports', description="Directory where reports will be saved")
 

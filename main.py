@@ -24,6 +24,7 @@ def main():
     config = AgentConfig(
         use_context_window=False,
         context_window_size=4,
+        context_mode='AROUND',
         generate_report=True,
         report_dir='reports',
         mitre_top_k=10
@@ -31,30 +32,30 @@ def main():
 
     alert_data = CSVAlertData(csv_path='data/alerts_dataset_parsed.csv')
 
-    llm_strict = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.0, seed=42)
-    llm_creative = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2, seed=42)
+    # llm_strict = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.0, seed=42)
+    # llm_creative = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2, seed=42)
 
     
-    # llm_strict = ChatOpenAI(
-    #     model="gemma-4-26b-a4b",
-    #     api_key='EMPTY',
-    #     temperature=0.0,
-    #     base_url="http://10.0.152.198:8003/v1",
-    # )
+    llm_strict = ChatOpenAI(
+        model="gemma-4-26b-a4b",
+        api_key='EMPTY',
+        temperature=0.0,
+        seed=42,
+        base_url="http://10.0.152.198:8003/v1",
+    )
 
-    # llm_creative = ChatOpenAI(
-    #     model="gemma-4-26b-a4b",
-    #     api_key='EMPTY',
-    #     temperature=0.2,
-    #     base_url="http://10.0.152.198:8003/v1",
-    # )
+    llm_creative = ChatOpenAI(
+        model="gemma-4-26b-a4b",
+        api_key='EMPTY',
+        temperature=0.2,
+        seed=42,
+        base_url="http://10.0.152.198:8003/v1",
+    )
 
-    # embedder = SentenceTransformerEmbedder()
-    cve_store = ElasticSearchVectorStore(index_name='kev_cve_index_bge')
-    # mitre_store = ElasticSearchVectorStore(index_name='mitre_attack')
 
     embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
     mitre_store = ElasticSearchVectorStore(index_name='mitre_attack_v3_bge_small')
+    cve_store = ElasticSearchVectorStore(index_name='kev_cve_index_bge')
 
     data_saver = CSVDataSaver(alerts_csv_path='reports/alerts_results.csv', evaluations_csv_path='reports/evaluations_results.csv')
     tracker = UniversalTokenTracker()
@@ -63,17 +64,9 @@ def main():
     evaluator = EvaluationRunner(agent, data_saver, config)
 
     # df = pd.read_csv('data/dataset_sintetico_cves.csv', parse_dates=['timestamp'])
-    df = pd.read_csv('data/mini_dataset_parsed.csv', parse_dates=['timestamp'])
-    alert = json.loads(df.iloc[8]['alert'])
-    # key_path = ['rule', 'mitre']  
-    # parent = alert
-    # for key in key_path[:-1]:
-    #     parent = parent.get(key, {})
-    #     if not isinstance(parent, dict):
-    #         parent = {}
-    #         break
-    # parent.pop(key_path[-1], None)
-    # # alert = {"description": 'Processes running for all users were queried with ps command.'}
+    df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
+    # alert = json.loads(df.iloc[4]['alert'])
+
     # alert = {
     #     "timestamp": "2026-06-14T10:15:22.412+0000",
     #     "rule": {
@@ -127,18 +120,19 @@ def main():
     #     "location": "/opt/oracle/psft/cfg/webserv/peoplesoft/servers/PIA/logs/access.log"
     # }
 
-    # evaluator.run_evaluation(df, dataset_name='CVE sintetico (15)', debug=True)
-    final_state, _ = agent.process_alert(alert)
+    evaluator.run_evaluation(df, dataset_name='Unique Alerts', debug=True)
+    # final_state, _ = agent.process_alert(alert)
 
-    report_text = final_state.get('final_report')
+    # report_text = final_state.get('final_report')
 
-    if report_text:
-        # alert_id = alert.get('id', 'unknown')
-        # context = 'with_context' if config.use_context_window else 'without_context'
-        # with open(f"reports/eval_{alert_id}_{context}.md", "w", encoding='utf-8') as f:
-        #     f.write(report_text)
-        print(report_text)
-    
+    # if report_text:
+    #     alert_id = alert.get('id', 'unknown')
+    #     context = 'with_context' if config.use_context_window else 'without_context'
+    #     report_dir = f"reports/escenario2"
+    #     os.makedirs(report_dir, exist_ok=True)
+    #     with open(f"{report_dir}/{alert_id}_{context}.md", "w", encoding='utf-8') as f:
+    #         f.write(report_text)
+
 
 
 if __name__ == "__main__":

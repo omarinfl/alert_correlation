@@ -127,7 +127,7 @@ def make_alert_context_node(config, alert_data, tracker):
             start_time = time.time()
 
             alert = state['original_alert']
-            context_window = alert_data.get_context_window(alert, config.context_window_size)
+            context_window = alert_data.get_context_window(alert, config.context_mode, config.context_window_size)
             
             tracker.record_node_time('alert_context_node', time.time() - start_time)
         
@@ -157,7 +157,7 @@ def make_validation_node(llm, tracker):
         if state.get('mitre_data'):  
             mitre_data = 'MITRE results:\n' + '\n'.join([f"Technique ID: {r['technique_id']}\n"
                             f"Name: {r['name']}\n"
-                            f"Description: {r['description']}\n"
+                            f"Description: {r['description']}\n" #.split('\n')[0] version recortada
                             f"Tactics: {r['tactics']}\n"
                             f"Platforms: {r['platforms']}\n"
                             "-----------------" for r in state['mitre_data'].values()]) 
@@ -227,7 +227,7 @@ def make_final_report_node(config, llm, tracker):
         validated_mitre = '\n'.join([
             f"Technique ID: {e.item_id}\n"
             f"Name: {state['mitre_data'][e.item_id]['name']}\n"
-            f"Description: {state['mitre_data'][e.item_id]['description']}\n"
+            f"Description: {state['mitre_data'][e.item_id]['description'].split('\n')[0]}\n"
             f"Tactics: {state['mitre_data'][e.item_id]['tactics']}\n"
             f"Platforms: {state['mitre_data'][e.item_id]['platforms']}\n"
             f"Mitigations: {state['mitre_data'][e.item_id]['mitigations']}\n"
@@ -253,7 +253,6 @@ def make_final_report_node(config, llm, tracker):
             f"In CISA KEV (Known Exploited Vulnerability): {state['cve_data'][e.item_id].get('in_kev')}\n"
             f"Affected Products/Versions: {state['cve_data'][e.item_id].get('affected_products')}\n"
             f"Mitigations/Remediation: {state['cve_data'][e.item_id].get('mitigations')}\n"
-            f"References & Patches: {state['cve_data'][e.item_id].get('references')}\n"
             f"Validador Confidence Score: {e.relevance_score}\n"
             f"Validador Explanation: {e.explanation}\n"
             "-----------------"

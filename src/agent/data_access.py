@@ -2,13 +2,13 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
-class AlertData(ABC):
+class AlertRepository(ABC):
     @abstractmethod
-    def get_context_window(self, alert_time: pd.Timestamp, window_size: int) -> List[Dict[str, Any]]:
+    def get_context_window(self, original_alert: Dict[str, Any], context_mode: str, window_size: int) -> List[Dict[str, Any]]:
         pass
 
 
-class CSVAlertData(AlertData):
+class CSVAlertRepository(AlertRepository):
     def __init__(self, csv_path: str):
         self.csv_path = csv_path
         self._df = None

@@ -18,3 +18,5 @@ EVAL-A4AD8D: Evaluación sobre los datos de CVE con gemini
 EVAL-D2C29A: Evaluación sobre los datos de CVE con gpt-oss
 EVAL-A3747E: Evaluación sobre los datos de CVE con gemini, utilizando prompt refinado para no inferir en la clasificación (AlertClassification2)
 EVAL-894CB6: Evaluación sobre los datos de CVE con gemma, sin generación de reportes
+EVAL-D1F60D: Evaluación sobre los datos de CVE con gemma, con generación de reportes, semilla
+EVAL-91315F: Evaluación sobre los datos de CVE con gemma, con generación de reportes, semilla, top_k=5

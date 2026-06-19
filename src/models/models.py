@@ -55,9 +55,7 @@ class AlertLog(BaseModel):
     alert_description: str
 
     predicted_ttps: List[str]
-    # inferred_ttps: List[str]
     predicted_cves: List[str]
-    # inferred_cves: List[str]
 
     real_ttps: List[str]
     real_cves: List[str]

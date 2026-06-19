@@ -116,7 +116,7 @@ def make_cve_search_node(embedder, cve_store, tracker):
         return {'cve_data': cleaned_results}
     return cve_search_node
 
-def make_alert_context_node(config, alert_data, tracker):
+def make_alert_context_node(config, alert_repo, tracker):
     def alert_context_node(state: AgentState) -> AgentState:
         '''Node that retrieves previous and subsequent alerts to provide context to the agent.'''
         if not config.use_context_window:
@@ -127,7 +127,7 @@ def make_alert_context_node(config, alert_data, tracker):
             start_time = time.time()
 
             alert = state['original_alert']
-            context_window = alert_data.get_context_window(alert, config.context_mode, config.context_window_size)
+            context_window = alert_repo.get_context_window(alert, config.context_mode, config.context_window_size)
             
             tracker.record_node_time('alert_context_node', time.time() - start_time)
         

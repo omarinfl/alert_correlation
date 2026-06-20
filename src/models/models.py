@@ -24,7 +24,6 @@ class ItemEvaluation(BaseModel):
     relevance_score: float = Field(description="A score from 0 to 1 indicating how relevant this item is to the original alert")
     explanation: str = Field(description="A detailed explanation of why this item is relevant (or not) to the alert")
     decision: bool = Field(description="True if the item is relevant and should be included in the final report, False otherwise")
-    # data: str = Field(description="The original data retrieved for this item. Empty if the item was not relevant and was discarded")
 
 class ValidationReport(BaseModel):
     mitre_evaluations: List[ItemEvaluation] = Field(description="A list of evaluations for each MITRE item retrieved")
@@ -35,8 +34,6 @@ class AgentState(TypedDict):
     context_window: List[str] = Field(description="A list of previous and post alerts that can provide context to the agent when analyzing the current alert. This can include previous alerts from the same source, alerts with similar characteristics, or any other relevant information that can help the agent understand the situation better.")
     
     classification: AlertClasification
-    # mitre_data: Annotated[List[Dict], Field(description="Relevant MITRE information retrieved")]
-    # cve_data: Annotated[List[Dict], Field(description="Relevant CVE information retrieved")]
 
     mitre_data: Annotated[Dict[str, Dict[str, Any]], Field(description="Relevant MITRE information retrieved")]  
     cve_data: Annotated[Dict[str, Dict[str, Any]], Field(description="Relevant CVE information retrieved")]   

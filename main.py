@@ -22,12 +22,12 @@ API_KEY = os.getenv('GEMINI_TOKEN')
 
 def main():
     config = AgentConfig(
-        use_context_window=False,
+        use_context_window=True,
         context_window_size=4,
         context_mode='AROUND',
         generate_report=True,
         report_dir='reports',
-        mitre_top_k=5
+        mitre_top_k=10
     )
 
 
@@ -64,8 +64,8 @@ def main():
     
     evaluator = EvaluationRunner(agent, data_saver, config)
 
-    df = pd.read_csv('data/dataset_sintetico_cves.csv', parse_dates=['timestamp'])
-    # df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
+    # df = pd.read_csv('data/dataset_sintetico_cves.csv', parse_dates=['timestamp'])
+    df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
     # alert = json.loads(df.iloc[4]['alert'])
 
     # alert = {
@@ -121,7 +121,7 @@ def main():
     #     "location": "/opt/oracle/psft/cfg/webserv/peoplesoft/servers/PIA/logs/access.log"
     # }
 
-    evaluator.run_evaluation(df, dataset_name='CVE sintetico (15)', debug=True)
+    evaluator.run_evaluation(df, dataset_name='Unique Alerts', debug=True)
     # final_state, _ = agent.process_alert(alert)
 
     # report_text = final_state.get('final_report')

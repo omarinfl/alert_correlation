@@ -13,6 +13,8 @@ EVAL-86CB9E: Gemini con top_k=5 y descripciones completas
 EVAL-932282: Gemma con top_k=5 y descripciones completas
 EVAL-AA144A: Gemma con top_k=5 y sin contexto
 EVAL-B068F6: Gemma con top_k=10 y sin contexto (descripciones cortadas)
+EVAL-46BA4E: Gemini top 10 definitiva
+EVAL-3548AF: Gemini top 10 sin contexto
 # CVE
 EVAL-A4AD8D: Evaluación sobre los datos de CVE con gemini
 EVAL-D2C29A: Evaluación sobre los datos de CVE con gpt-oss
@@ -20,3 +22,4 @@ EVAL-A3747E: Evaluación sobre los datos de CVE con gemini, utilizando prompt re
 EVAL-894CB6: Evaluación sobre los datos de CVE con gemma, sin generación de reportes
 EVAL-D1F60D: Evaluación sobre los datos de CVE con gemma, con generación de reportes, semilla
 EVAL-91315F: Evaluación sobre los datos de CVE con gemma, con generación de reportes, semilla, top_k=5
+EVAL-79E93D: Gemini top 5

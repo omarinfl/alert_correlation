@@ -259,12 +259,6 @@ def make_final_report_node(config, llm, tracker):
             for e in valid_cve_evals
             if e.item_id in state['cve_data']
         ])
-
-
-        # prompt = f'''
-        # You are a SOC analyst. Your task is to generate a final report based on the information about the alert, the relevant MITRE techniques and its tactics and CVE vulnerabilities that have been identified.
-        # Generate a concise report in Markdown format summarizing the incident, correlating the MITRE and CVE information with the original alert, and providing an assessment of the priority and severity of the incident, as well as recommended response actions.
-        # '''
         
         prompt = f'''
         You are a Senior Tier 3 SOC Analyst. Your task is to generate a final incident report based on the provided alert, context, and validated threat intelligence.

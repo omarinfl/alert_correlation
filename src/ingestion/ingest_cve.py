@@ -1,5 +1,5 @@
-from embedders import SentenceTransformerEmbedder
-from store import ElasticSearchVectorStore
+from src.retrieval.embedders import SentenceTransformerEmbedder
+from src.retrieval.store import ElasticSearchVectorStore
 import requests
 import os
 import zipfile
@@ -217,7 +217,6 @@ def main():
             if len(documents) >= 1000:
                 vector_store.add_documents(documents)
                 documents = []
-                # print("1000 Documentos añadidos a la base de datos...")
 
     if documents:
         vector_store.add_documents(documents)

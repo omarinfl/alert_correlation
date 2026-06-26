@@ -11,14 +11,6 @@ class AlertClasification(BaseModel):
     cve_keywords: str = Field(description="The exact query to search in CVE database. Empty if cve_search is False")
     cve_description: str = Field(description="Detailed description of the alert related to CVE information. DO NOT try to identify the CVE associated, TRY to explain the context to search in the vector database. Empty if cve_search is False")
 
-# class AlertClasification2(BaseModel):
-#     mitre_search: bool = Field(description="True if the alert contains behaviors, commands, processes, tactics or malware. ONLY set to False if you are 100% sure that the alert does not contain any information that can be used to search in MITRE database")
-#     mitre_keywords: str = Field(description="Extract ONLY observable technical symptoms from the log (e.g., 'bash execution', 'base64 decoding', 'path traversal'). CRITICAL: DO NOT guess, generate, or output MITRE TTP IDs (like T1190 or T1059) under any circumstances.")
-#     mitre_description: str = Field(description="Describe literally what is happening in the log. DO NOT name specific MITRE tactics or techniques. Just describe the raw behavior.")
-#     cve_search: bool = Field(description="True if the alert contains software versions, scan results, vulnerability identifiers or behaviours related to exploiting attemps. ONLY set to False if you are 100% sure that the alert does not contain any information that can be used to search in CVE database")
-#     cve_keywords: str = Field(description="Extract ONLY literal infrastructure entities found in the log: [Vendor, Product name, HTTP method, File paths]. CRITICAL: DO NOT guess or write CVE IDs (e.g., CVE-2021-44228) or vulnerability names (e.g., Log4Shell) unless they are explicitly written inside the alert text.")
-#     cve_description: str = Field(description="Describe the infrastructure being targeted based ONLY on the observed paths, ports, or application headers. Do not hypothesize about the exploit name.")
-
 class ItemEvaluation(BaseModel):
     item_id: str = Field(description="The ID of the item being evaluated (e.g., MITRE technique ID or CVE ID)")
     relevance_score: float = Field(description="A score from 0 to 1 indicating how relevant this item is to the original alert")
@@ -70,7 +62,6 @@ class EvaluationResult(BaseModel):
 
     dataset_name: str
     agent_config: AgentConfig
-    # agent_components: dict[str, str]
 
     alerts_evaluated: int
 

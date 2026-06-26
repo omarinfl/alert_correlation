@@ -82,14 +82,6 @@ class UniversalTokenTracker(BaseCallbackHandler):
         self.completion_tokens += out_tok
         self.total_tokens += total_tok
 
-        # print(f'Guardadas stats de {self.current_node}')
-        # print(node_stats)
-
-        # print('Tokens totales acumulados de la ejecución')
-        # print(f'Input Tokens: {self.prompt_tokens}')
-        # print(f'Output Tokens: {self.completion_tokens}')
-        # print(f'Total Tokens: {self.total_tokens}')
-
     def reset(self):
         """Reinicia los contadores para la siguiente alerta."""
         self.prompt_tokens = 0

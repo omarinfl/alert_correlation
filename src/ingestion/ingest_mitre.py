@@ -1,5 +1,5 @@
-from embedders import SentenceTransformerEmbedder, LocalvLLMEmbedder
-from store import ElasticSearchVectorStore
+from src.retrieval.embedders import SentenceTransformerEmbedder
+from src.retrieval.store import ElasticSearchVectorStore
 from mitreattack.stix20 import MitreAttackData
 import requests
 import os
@@ -192,75 +192,74 @@ def download_mitre_attack_data():
         print(f"Error al verificar o descargar el archivo MITRE ATT&CK: {e}")
         return None
 
-print("Inicializando módulos...")
-# embedder = SentenceTransformerEmbedder()
-embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
-vector_store = ElasticSearchVectorStore(index_name='mitre_attack_v3_bge_small')
+def main():
+    print("Inicializando módulos...")
+    embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
+    vector_store = ElasticSearchVectorStore(index_name='mitre_attack_v3_bge_small_prueba')
 
-# embedder = LocalvLLMEmbedder()
-# vector_store = ElasticSearchVectorStore(index_name='mitre_attack_bge')
-
-print("Preparando la base de datos...")
-mitre_columns = {
-    'name': {'type': 'text'},
-    'description': {'type': 'text'},
-    'tactics': {'type': 'keyword'},
-    'platforms': {'type': 'keyword'},
-    'technique_id': {'type': 'keyword'}
-}
-
-vector_store.initialize(dims=384, custom_columns=mitre_columns)
-# vector_store.initialize(dims=1024, custom_columns=mitre_columns)
-
-
-print("Cargando datos de MITRE ATT&CK...")
-mitre_data = MitreAttackData(download_mitre_attack_data())
-techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtramos técnicas revocadas o deprecadas
-
-documents = []
-for t in techniques:
-    print(f"Procesando técnica: {t.name}")
-    
-    description = limpiar_texto_mitre(t.description)
-    procedures_txt = obtener_procedimientos(mitre_data, t.id)
-    mitigations_txt = obtener_mitigaciones(mitre_data, t.id)
-    detections_txt = obtener_detecciones(mitre_data, t.id)
-    
-    text_to_embed = f'''The technique {t.name}(ID: {mitre_data.get_attack_id(t.id)}) belongs to the {",".join([phase.phase_name for phase in t.kill_chain_phases])} tactics.
-                        {description}. It is used on platforms: {t.x_mitre_platforms}'''
-    
-    text_to_search = f'''{text_to_embed}
-                    PROCEDURE EXAMPLES:
-                    {procedures_txt}
-
-                    DETECTION STRATEGIES:
-                    {detections_txt}
-                    '''
-    
-    doc = {
-        'id': t.id,
-        'technique_id': mitre_data.get_attack_id(t.id),
-        'name': t.name,
-        'description': t.description,
-        'tactics': [phase.phase_name for phase in t.kill_chain_phases],
-        'platforms': t.x_mitre_platforms,
-        'is_subtechnique': t.x_mitre_is_subtechnique,
-        'external_references': [dict(ref) for ref in t.external_references if ref],
-        'mitigations': mitigations_txt,
-        'detections': detections_txt,
-        'procedures': procedures_txt, 
-        'vector': embedder.embed_query(text_to_embed),
-        'text_to_search': text_to_search
+    print("Preparando la base de datos...")
+    mitre_columns = {
+        'name': {'type': 'text'},
+        'description': {'type': 'text'},
+        'tactics': {'type': 'keyword'},
+        'platforms': {'type': 'keyword'},
+        'technique_id': {'type': 'keyword'}
     }
 
-    documents.append(doc)
+    vector_store.initialize(dims=384, custom_columns=mitre_columns)
 
-    if len(documents) >= 100:
+
+    print("Cargando datos de MITRE ATT&CK...")
+    mitre_data = MitreAttackData(download_mitre_attack_data())
+    techniques = mitre_data.get_techniques(remove_revoked_deprecated=True)  # Filtramos técnicas revocadas o deprecadas
+
+    documents = []
+    for t in techniques:
+        print(f"Procesando técnica: {t.name}")
+        
+        description = limpiar_texto_mitre(t.description)
+        procedures_txt = obtener_procedimientos(mitre_data, t.id)
+        mitigations_txt = obtener_mitigaciones(mitre_data, t.id)
+        detections_txt = obtener_detecciones(mitre_data, t.id)
+        
+        text_to_embed = f'''The technique {t.name}(ID: {mitre_data.get_attack_id(t.id)}) belongs to the {",".join([phase.phase_name for phase in t.kill_chain_phases])} tactics.
+                            {description}. It is used on platforms: {t.x_mitre_platforms}'''
+        
+        text_to_search = f'''{text_to_embed}
+                        PROCEDURE EXAMPLES:
+                        {procedures_txt}
+
+                        DETECTION STRATEGIES:
+                        {detections_txt}
+                        '''
+        
+        doc = {
+            'id': t.id,
+            'technique_id': mitre_data.get_attack_id(t.id),
+            'name': t.name,
+            'description': t.description,
+            'tactics': [phase.phase_name for phase in t.kill_chain_phases],
+            'platforms': t.x_mitre_platforms,
+            'is_subtechnique': t.x_mitre_is_subtechnique,
+            'external_references': [dict(ref) for ref in t.external_references if ref],
+            'mitigations': mitigations_txt,
+            'detections': detections_txt,
+            'procedures': procedures_txt, 
+            'vector': embedder.embed_query(text_to_embed),
+            'text_to_search': text_to_search
+        }
+
+        documents.append(doc)
+
+        if len(documents) >= 100:
+            vector_store.add_documents(documents)
+            documents = []
+            print("100 Documentos añadidos a la base de datos...")
+
+    if documents:
         vector_store.add_documents(documents)
-        documents = []
-        print("100 Documentos añadidos a la base de datos...")
 
-if documents:
-    vector_store.add_documents(documents)
+    print("Base de datos de MITRE ATT&CK lista.")
 
-print("Base de datos de MITRE ATT&CK lista.")
+if __name__ == "__main__":
+    main()

@@ -15,7 +15,7 @@ class EvaluationRunner:
         self.evaluation_debug = []
 
     def run_evaluation(self, dataset_df, dataset_name: str, debug: bool):
-        print(f"🚀 Iniciando Evaluación: {self.evaluation_id}")
+        print(f"Iniciando Evaluación: {self.evaluation_id}")
         
         total_alerts = 0
         total_time = 0.0
@@ -84,7 +84,7 @@ class EvaluationRunner:
             total_tokens += telemetry["token_usage"]["total_tokens"]
             total_llm_calls += telemetry["llm_calls"]
             
-            # Lógica básica de acierto (Si descubrió al menos un TTP real)
+            # Lógica básica de acierto (Si descubrió al menos un TTP real, con jerárquía)
             if any(ttp in real_ttps for ttp in predicted_ttps):
                 aciertos_mitre += 1
             
@@ -113,6 +113,7 @@ class EvaluationRunner:
                     },
                     'retrieved_mitre': final_state.get('mitre_data'),
                     'retrieved_cve': final_state.get('cve_data'),
+                    'alert_context': final_state.get('context_window'),
                     'validation': val_report.model_dump(),
                     'real_ttps': real_ttps,
                     'predicted_ttps': predicted_ttps,
@@ -131,8 +132,6 @@ class EvaluationRunner:
             evaluation_id=self.evaluation_id,
             dataset_name=dataset_name,
             agent_config=self.config,
-            # agent_components={"llm": self.agent.llm.__class__.__name.__, 
-            #                   "embedder": self.agent.embedder.__class__.__name.__},
             alerts_evaluated=total_alerts,
             mitre_accuracy=mitre_acc,
             cve_accuracy=cve_acc,
@@ -144,6 +143,6 @@ class EvaluationRunner:
         
         self.data_saver.save_evaluation_result(eval_result)
         if debug:
-            with open(f'notes/{self.evaluation_id}_debug.json', 'w', encoding='utf-8') as file:
-                json.dump(self.evaluation_debug, file, indent=4, ensure_ascii=False)
-        print("✅ Evaluación finalizada.")
+            with open(f'notes/debugs/{self.evaluation_id}_debug.json', 'w', encoding='utf-8') as file:
+                json.dump(self.evaluation_debug, file, indent=4, ensure_ascii=False, default=str)
+        print("Evaluación finalizada.")

@@ -63,7 +63,7 @@
             },
             "location": "/var/log/audit/audit.log"
         },
-        "description": "The alert indicates that the 'ps auxwww' command was executed by the 'www-data' user. This command is commonly used for process discovery to list all running processes on the system, which is a common behavior during the reconnaissance phase of an attack.",
+        "description": "The alert indicates that the 'ps auxwww' command was executed by the 'www-data' user. This command is commonly used for process discovery to list all running processes on the system, which is a technique often employed by attackers for reconnaissance after gaining initial access to a web server.",
         "keywords": "ps auxwww, process discovery, system information discovery",
         "alert_desc": "Processes running for all users were queried with ps command.",
         "labels": [
@@ -133,8 +133,8 @@
             },
             "location": "journald"
         },
-        "description": "The alert indicates a successful SSH authentication for the root user from a remote IP address using public key authentication. This behavior relates to remote access and the use of valid accounts to access systems.",
-        "keywords": "Valid Accounts, SSH, Remote Access",
+        "description": "The alert indicates a successful SSH authentication for the root user from an external IP address using public key authentication. This behavior relates to the use of remote services and the authentication of valid accounts.",
+        "keywords": "Remote Services, SSH, Valid Accounts",
         "alert_desc": "sshd: authentication success.",
         "labels": [
             "T1078",
@@ -203,8 +203,8 @@
             },
             "location": "journald"
         },
-        "description": "The alert indicates a successful SSH login session opened for the root user on the host videoserver. This behavior relates to authentication and session management, which can be analyzed for unauthorized access or lateral movement.",
-        "keywords": "Valid Accounts, SSH, Remote System Services",
+        "description": "The alert indicates a successful SSH login session opened for the root user on the host videoserver. This behavior relates to authentication and access control, specifically the use of privileged accounts via remote access protocols.",
+        "keywords": "SSH remote login, root user authentication, T1078 Valid Accounts",
         "alert_desc": "PAM: Login session opened.",
         "labels": [
             "T1078"
@@ -265,8 +265,8 @@
             },
             "location": "wazuh-remoted"
         },
-        "description": "The Wazuh security agent on the host 'videoserver' has stopped, which may indicate an attempt to disable security monitoring or evade detection.",
-        "keywords": "Impair Defenses, Indicator Removal on Host",
+        "description": "The Wazuh agent on host videoserver (172.17.100.121) has stopped, which may indicate an attempt to disable security monitoring or evade detection by terminating security services.",
+        "keywords": "Impair Defenses, Indicator Removal, Service Stop",
         "alert_desc": "Wazuh agent stopped.",
         "labels": [
             "T1685"
@@ -314,8 +314,8 @@
             },
             "location": "/var/log/auth.log"
         },
-        "description": "The alert indicates that the root user executed a command as the www-data user via sudo for the first time on the system. This behavior involves privilege management and potential lateral movement or execution of commands under different user contexts.",
-        "keywords": "sudo, privilege escalation, abuse of privilege",
+        "description": "The alert indicates that the root user executed a command as the www-data user via sudo for the first time. This behavior involves the use of sudo to switch user contexts, which is a common technique for privilege escalation or lateral movement within a system.",
+        "keywords": "sudo, privilege escalation, abuse of sudo",
         "alert_desc": "First time user executed sudo.",
         "labels": [
             "T1548.003"
@@ -380,8 +380,8 @@
             },
             "location": "/var/log/auth.log"
         },
-        "description": "The alert indicates a successful sudo execution where the root user executed the command /usr/bin/zmdc.pl check as the www-data user. This involves the use of sudo for privilege management and the execution of a specific ZoneMinder script.",
-        "keywords": "sudo, privilege escalation, zmdc.pl",
+        "description": "The alert indicates that the root user executed the command /usr/bin/zmdc.pl with the check argument while acting as the www-data user. This involves the use of sudo to execute a specific script within the ZoneMinder directory, which is a common pattern for administrative tasks but can also be associated with privilege escalation or lateral movement if performed by unauthorized accounts.",
+        "keywords": "sudo, privilege escalation, zmdc.pl, process execution",
         "alert_desc": "Successful sudo executed.",
         "labels": [
             "T1548.003"
@@ -457,7 +457,7 @@
             },
             "location": "/var/log/auth.log"
         },
-        "description": "The system detected the creation of a new user account named webadmin via the useradd command on the host videoserver. This activity is a common indicator of persistence or privilege escalation.",
+        "description": "The system recorded the creation of a new user account named webadmin using the useradd command. This activity is associated with account manipulation and persistence techniques.",
         "keywords": "Create Account, Local Account",
         "alert_desc": "New user added to the system.",
         "labels": [
@@ -531,7 +531,7 @@
             },
             "location": "/var/log/auth.log"
         },
-        "description": "The user webadmin successfully executed the command /usr/bin/lspci with root privileges via sudo on the host videoserver. This activity involves privilege escalation and system information discovery.",
+        "description": "The user webadmin successfully executed the command /usr/bin/lspci with root privileges via sudo. This activity involves privilege escalation and the execution of system enumeration tools to gather hardware information.",
         "keywords": "sudo, privilege escalation, lspci",
         "alert_desc": "Successful sudo to ROOT executed.",
         "labels": [
@@ -597,7 +597,7 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates that a source IP address is performing automated web scanning using the Nikto vulnerability scanner, as evidenced by the user-agent string and multiple 404 error codes generated by requests for non-existent files.",
+        "description": "The alert indicates that an external source (192.42.1.174) is performing automated web reconnaissance using the Nikto vulnerability scanner. The activity involves rapid, sequential HTTP GET requests for various non-existent files and common sensitive paths, which is characteristic of a web application vulnerability scan aimed at identifying misconfigurations or exploitable endpoints.",
         "keywords": "Nikto, web scanning, reconnaissance, vulnerability scanning",
         "alert_desc": "Multiple web server 400 error codes from same source ip.",
         "labels": [
@@ -660,8 +660,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates that an external IP address (192.42.1.174) is performing web reconnaissance using the Nikto vulnerability scanner (version 2.1.5) against the target server, specifically attempting to access backup files.",
-        "keywords": "Nikto vulnerability scanner, web application scanning, reconnaissance",
+        "description": "The alert indicates that an external IP address is using the Nikto web vulnerability scanner (version 2.1.5) to perform reconnaissance against the web server. The scanner is attempting to access specific files (e.g., .bak files) to identify potential misconfigurations or sensitive information disclosure.",
+        "keywords": "Nikto, vulnerability scanning, reconnaissance, web application scanning",
         "alert_desc": "Suspicious URL access.",
         "labels": [
             "T1055"
@@ -724,7 +724,7 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates a web application vulnerability scan performed by the Nikto tool, specifically targeting the /cgi-bin/pollit/Poll_It_SSI_v2.0.cgi script with a path traversal payload attempting to access /etc/passwd.",
+        "description": "The alert indicates an external actor using the Nikto web scanner to perform reconnaissance and path traversal attacks against a CGI script. The attacker is attempting to access sensitive system files like /etc/passwd by manipulating the data_dir parameter in the Poll_It_SSI_v2.0.cgi script.",
         "keywords": "Path Traversal, Web Application Scanning, Nikto",
         "alert_desc": "Common web attack.",
         "labels": [
@@ -791,8 +791,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates that a source IP address is performing automated web application vulnerability scanning using the Nikto tool. The logs show multiple attempts to access sensitive files, directories, and common web application vulnerabilities such as directory traversal, command execution, and unauthorized access to configuration files.",
-        "keywords": "Vulnerability Scanning, Web Application Scanning, Nikto, Directory Traversal, Path Traversal, Web Application Attack",
+        "description": "The alert indicates that a source IP is performing automated web application vulnerability scanning using the Nikto tool. The logs show attempts to identify common vulnerabilities, including directory traversal, remote code execution via cgi-bin, and access to sensitive files or configuration paths, which are typical reconnaissance activities.",
+        "keywords": "Nikto, web application scanning, vulnerability scanning, reconnaissance, directory traversal, remote code execution",
         "alert_desc": "Multiple common web attacks from same source ip.",
         "labels": [
             "T1055",
@@ -856,8 +856,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates a Cross-Site Scripting (XSS) attempt targeting a web application via a GET request containing a script tag in the sitename parameter. The request originated from an IP address using the Nikto vulnerability scanner.",
-        "keywords": "Cross-Site Scripting, XSS, Web Application Attack",
+        "description": "The alert indicates an attempt to perform a Cross-Site Scripting (XSS) attack against a web application using the Nikto vulnerability scanner. The attacker is injecting a script tag into the 'sitename' parameter of the 'mambosimple.php' file to test for vulnerability execution.",
+        "keywords": "Cross-Site Scripting, Nikto, Web Application Scanning",
         "alert_desc": "XSS (Cross Site Scripting) attempt.",
         "labels": [
             "T1059.007"
@@ -922,8 +922,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates multiple Cross-Site Scripting (XSS) attempts originating from a single source IP address. The logs reveal the use of the Nikto web vulnerability scanner to perform automated injection attacks against various PHP scripts on the web server.",
-        "keywords": "Cross-Site Scripting, XSS, Web Application Scanning, Nikto",
+        "description": "The alert indicates an external source using the Nikto web vulnerability scanner to perform automated Cross-Site Scripting (XSS) injection attempts against various PHP endpoints on the web server. The activity involves systematic probing of URL parameters to identify potential injection vulnerabilities.",
+        "keywords": "Cross-Site Scripting, Vulnerability Scanner, Web Application Scanning",
         "alert_desc": "Multiple XSS (Cross Site Scripting) attempts from same source ip.",
         "labels": [
             "T1059"
@@ -988,8 +988,8 @@
             },
             "location": "/var/www/default/log/error.log"
         },
-        "description": "The alert shows multiple HTTP GET requests containing directory traversal sequences (e.g., ../, %2e%2e/) targeting sensitive system files such as /etc/passwd, boot.ini, and winnt/repair/sam._. This indicates an attempt to access files outside the web root directory.",
-        "keywords": "Path Traversal, Directory Traversal, Web Application Attack",
+        "description": "The alert indicates a series of directory traversal attempts (using ../ sequences) targeting sensitive system files like /etc/passwd, boot.ini, and win.ini. This behavior is characteristic of an automated web scanner or an attacker attempting to perform unauthorized file system access on the web server.",
+        "keywords": "Path Traversal, Directory Traversal, Web Application Scanning",
         "alert_desc": "Apache: Multiple Invalid URI requests from same source.",
         "labels": [
             "T1499"
@@ -1054,7 +1054,7 @@
             },
             "location": "/var/www/default/log/error.log"
         },
-        "description": "The alert indicates an attempt to access a directory on an Apache web server where directory indexing is disabled. This behavior is often associated with reconnaissance or directory enumeration, where an attacker attempts to list files in sensitive or restricted directories to identify potential targets or configuration files.",
+        "description": "An external client attempted to access a directory on an Apache web server that does not have an index file and has directory listing disabled. This behavior is often associated with reconnaissance or directory enumeration to identify sensitive files or server structure.",
         "keywords": "Directory Listing, Reconnaissance, Discovery",
         "alert_desc": "Apache: Attempt to access forbidden directory index.",
         "labels": [
@@ -1119,8 +1119,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates a SQL injection attempt targeting a web application endpoint (/xsql/demo/adhocsql/query.xsql) using a GET request. The request user-agent identifies the source as the Nikto vulnerability scanner (version 2.1.5), suggesting an automated reconnaissance or exploitation attempt.",
-        "keywords": "SQL Injection, Nikto scanner",
+        "description": "The alert indicates a SQL injection attempt targeting a web application endpoint (/xsql/demo/adhocsql/query.xsql) using a malicious SQL query string. The request originated from a source identified as the Nikto vulnerability scanner, suggesting an automated reconnaissance or exploitation attempt against the web server.",
+        "keywords": "SQL injection, vulnerability scanning, Nikto",
         "alert_desc": "SQL injection attempt.",
         "labels": [
             "T1190"
@@ -1182,8 +1182,8 @@
             },
             "location": "/var/www/default/log/access.log"
         },
-        "description": "The alert indicates a web application vulnerability scan originating from an external IP address using the Nikto scanner tool, specifically targeting PHP CGI-bin configurations.",
-        "keywords": "vulnerability scanning, web application scanning, Nikto",
+        "description": "The alert indicates an external source using the Nikto web vulnerability scanner to probe for PHP CGI-bin vulnerabilities. This activity involves automated reconnaissance and scanning of web applications to identify potential security weaknesses.",
+        "keywords": "Vulnerability scanning, Web application scanning, Nikto, Reconnaissance",
         "alert_desc": "PHP CGI-bin vulnerability attempt.",
         "labels": [
             "T1210"
@@ -1254,8 +1254,8 @@
             },
             "location": "/var/log/audit/audit.log"
         },
-        "description": "The alert indicates that the 'www-data' user executed a recursive search command (find) followed by 'ls' to inspect specific system files and directories, including hidden Java system preference files. This behavior is indicative of reconnaissance or discovery activities on a Linux system.",
-        "keywords": "System Information Discovery, File and Directory Discovery, T1083, T1082",
+        "description": "The alert indicates that a process running as the 'www-data' user executed a recursive file discovery command using 'find' and 'ls' to inspect sensitive system directories, including Java system preferences. This behavior is consistent with reconnaissance activities where an attacker attempts to map the file system or locate configuration files for potential privilege escalation or sensitive information harvesting.",
+        "keywords": "T1083, T1059.004, File and Directory Discovery, Unix Shell",
         "alert_desc": "Executed recursive query of all files using ls command.",
         "labels": [
             "T1083"
@@ -1319,7 +1319,7 @@
             },
             "location": "/var/log/kern.log"
         },
-        "description": "The network interface ens3 on host inetfw has entered promiscuous mode, which allows the device to capture all network traffic passing through the interface. This behavior is often associated with network reconnaissance or traffic interception.",
+        "description": "The network interface ens3 on the host inetfw has entered promiscuous mode, which allows the device to capture all network traffic passing through the interface. This behavior is often associated with network reconnaissance, traffic interception, or unauthorized packet sniffing.",
         "keywords": "network sniffing, promiscuous mode, packet capture",
         "alert_desc": "Interface entered in promiscuous(sniffing) mode.",
         "labels": [

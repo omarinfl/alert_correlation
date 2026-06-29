@@ -21,3 +21,6 @@ data/alerts_dataset*.csv
 
 # Informes finales generados
 reports/
+
+# Anotaciones
+notes/

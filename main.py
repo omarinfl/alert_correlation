@@ -69,14 +69,15 @@ def main():
     # Instanciar el agente con los componentes definidos
     agent = SOCAgent(config, llm_strict, llm_creative, alert_data, embedder, mitre_store, cve_store, tracker)
     
+    # Datos
+    df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
+
     # Si se quiere ejecutar una evaluación:  
     # Definir el guardado de los datos
     # data_saver = CSVDataSaver(alerts_csv_path='evaluations/alerts_results.csv', evaluations_csv_path='evaluations/evaluations_results.csv')
     
     # # Definir el evaluador
     # evaluator = EvaluationRunner(agent, data_saver, config)
-
-    # df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
    
     # evaluator.run_evaluation(df, dataset_name='Unique Alerts', debug=True)
 

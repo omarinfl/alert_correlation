@@ -1,6 +1,5 @@
 import uuid
 import json
-from datetime import datetime
 from src.models.models import AlertLog, EvaluationResult 
 import time
 import os
@@ -28,7 +27,7 @@ class EvaluationRunner:
         for index, row in dataset_df.iterrows():
             alert_data = json.loads(row.get('alert', '{}')) 
             
-            # 1. EJECUTAR AGENTE
+            # Ejecutar Agente
             try:
                 final_state, telemetry = self.agent.process_alert(alert_data)
             except:
@@ -36,7 +35,7 @@ class EvaluationRunner:
                 time.sleep(70)
                 final_state, telemetry = self.agent.process_alert(alert_data)
 
-            # 2. EXTRAER RESULTADOS
+            # Extraer los resultados
             val_report = final_state.get('validation_report')
             predicted_ttps = [e.item_id for e in val_report.mitre_evaluations if e.decision] if val_report else []
             predicted_cves = [e.item_id for e in val_report.cve_evaluations if e.decision] if val_report else []
@@ -58,7 +57,7 @@ class EvaluationRunner:
                 with open(report_path, 'w', encoding='utf-8') as f:
                     f.write(report_text)
 
-            # 3. CREAR LOG DE ALERTA
+            # Crear el log de la Alerta
             alert_log = AlertLog(
                 evaluation_id=self.evaluation_id,
                 alert_id=str(alert_id),
@@ -75,16 +74,16 @@ class EvaluationRunner:
                 node_breakdown=json.dumps(telemetry["node_breakdown"]),
             )
             
-            # Guardamos la alerta
+            # Guardar la alerta
             self.data_saver.save_alert_log(alert_log)
             
-            # Actualizamos contadores globales
+            # Actualizar contadores globales
             total_alerts += 1
             total_time += telemetry["execution_time"]
             total_tokens += telemetry["token_usage"]["total_tokens"]
             total_llm_calls += telemetry["llm_calls"]
             
-            # Lógica básica de acierto (Si descubrió al menos un TTP real, con jerárquía)
+            # Lógica de acierto (Si descubrió al menos un TTP real, con jerárquía)
             if any(ttp in real_ttps for ttp in predicted_ttps):
                 aciertos_mitre += 1
             
@@ -98,6 +97,7 @@ class EvaluationRunner:
             if any(cve in real_cves for cve in predicted_cves):
                             aciertos_cve += 1          
 
+            # Guardar debugging
             if debug:
                 self.evaluation_debug.append({
                     'original_alert': alert_data,
@@ -123,7 +123,7 @@ class EvaluationRunner:
 
                     
 
-        # 4. CREAR RESULTADO GLOBAL
+        # Crear resultado global de evaluación
         avg_time = total_time / total_alerts if total_alerts > 0 else 0
         mitre_acc = (aciertos_mitre / total_alerts) * 100 if total_alerts > 0 else 0
         cve_acc = (aciertos_cve / total_alerts) * 100 if total_alerts > 0 else 0
@@ -141,8 +141,12 @@ class EvaluationRunner:
             avg_llm_calls=round(total_llm_calls / total_alerts, 2) if total_alerts > 0 else 0
         )
         
+        # Guardar evaluación
         self.data_saver.save_evaluation_result(eval_result)
+
+        # Guardar debug
         if debug:
             with open(f'notes/debugs/{self.evaluation_id}_debug.json', 'w', encoding='utf-8') as file:
                 json.dump(self.evaluation_debug, file, indent=4, ensure_ascii=False, default=str)
+                
         print("Evaluación finalizada.")

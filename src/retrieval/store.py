@@ -11,7 +11,7 @@ class VectorStore(ABC):
         pass
 
     @abstractmethod
-    def search(self, query_vector: list[float], top_k: int = 5) -> list[dict]:
+    def search_vector(self, query_vector: list[float], top_k: int = 5) -> list[dict]:
         pass
 
 class ElasticSearchVectorStore(VectorStore):
@@ -52,7 +52,7 @@ class ElasticSearchVectorStore(VectorStore):
         self.helpers.bulk(self.client, transformed_docs)
         self.client.indices.refresh(index=self.index_name)
 
-    def search(self, query_vector: list[float], top_k: int = 5, filter: dict = None) -> list[dict]:
+    def search_vector(self, query_vector: list[float], top_k: int = 5, filter: dict = None) -> list[dict]:
         query = {
             "size": top_k,
             "knn": {
@@ -70,7 +70,7 @@ class ElasticSearchVectorStore(VectorStore):
         return [hit['_source'] for hit in response['hits']['hits']]
     
 
-    def search_mitre_hybrid_simple(self, query_vector, query_text, top_k=5, knn_boost=0.6, bm25_boost=0.4):
+    def search_hybrid(self, query_vector, query_text, top_k=5, knn_boost=0.6, bm25_boost=0.4):
         query = {
                 "size": top_k,
                 "knn": {

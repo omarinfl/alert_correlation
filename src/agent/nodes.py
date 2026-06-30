@@ -1,5 +1,4 @@
 
-import os
 from langchain_core.messages import SystemMessage, HumanMessage
 from src.models.models import AlertClasification, AgentState, ValidationReport
 import time
@@ -60,7 +59,7 @@ def make_mitre_search_node(embedder, mitre_store, config, tracker):
         query = state['classification'].mitre_keywords
         query_vector = embedder.embed_query(prefix + query)
 
-        results = mitre_store.search_mitre_hybrid_simple(query_vector, desc, top_k=config.mitre_top_k)
+        results = mitre_store.search_hybrid(query_vector, desc, top_k=config.mitre_top_k)
         
         cleaned_results = {
             r.get('technique_id'): {
@@ -94,7 +93,7 @@ def make_cve_search_node(embedder, cve_store, tracker):
         query = state['classification'].cve_keywords
         query_vector = embedder.embed_query(prefix + query)
         
-        results = cve_store.search_mitre_hybrid_simple(query_vector, desc, top_k=3)
+        results = cve_store.search_hybrid(query_vector, desc, top_k=3)
         
         cleaned_results = {
             r.get('id'): {
@@ -146,6 +145,7 @@ def make_validation_node(llm, tracker):
 
         if not state.get('mitre_data') and not state.get('cve_data'):
             print('Búsqueda omitida por el clasificador. Saltando validación LLM...')
+            
             # Devolvemos un reporte vacío instantáneo sin llamar al LLM
             empty_report = ValidationReport(mitre_evaluations=[], cve_evaluations=[])
             tracker.record_node_time('validation_node', time.time() - start_time)
@@ -223,7 +223,6 @@ def make_final_report_node(config, llm, tracker):
             reverse=True
         )
 
-        # validated_mitre = [e for e in validated_data.mitre_evaluations if e.decision]
         validated_mitre = '\n'.join([
             f"Technique ID: {e.item_id}\n"
             f"Name: {state['mitre_data'][e.item_id]['name']}\n"

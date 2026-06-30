@@ -9,13 +9,13 @@ def limpiar_texto_mitre(texto):
     if not texto:
         return ""
     
-    # 1. Eliminar citaciones de MITRE: (Citation: Nombre Año)
+    # Eliminar citaciones: (Citation: Nombre Año)
     texto = re.sub(r'\(Citation:\s*[^)]+\)', '', texto)
     
-    # 2. Limpiar enlaces Markdown: [Texto](URL) -> Nos quedamos solo con 'Texto'
+    # Limpiar enlaces Markdown: [Texto](URL) -> Nos quedamos solo con 'Texto'
     texto = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', texto)
     
-    # 3. Limpiar espacios en blanco extras que hayan quedado
+    # Limpiar espacios en blanco extras 
     texto = re.sub(r'\s+', ' ', texto).strip()
     
     return texto
@@ -25,7 +25,7 @@ def obtener_procedimientos(mitre_data, technique_stix_id):
     """Extrae ejemplos reales de software y grupos APT usando la técnica."""
     texto_procedimientos = []
     
-    # 1. Software (Malware/Herramientas) que usan la técnica
+    # Software (Malware/Herramientas) que usan la técnica
     try:
         software_using = mitre_data.get_software_using_technique(technique_stix_id)
         for item in software_using:
@@ -41,7 +41,7 @@ def obtener_procedimientos(mitre_data, technique_stix_id):
     except Exception:
         pass
 
-    # 2. Grupos (APTs) que usan la técnica
+    # Grupos (APTs) que usan la técnica
     try:
         groups_using = mitre_data.get_groups_using_technique(technique_stix_id)
         for item in groups_using:
@@ -57,9 +57,8 @@ def obtener_procedimientos(mitre_data, technique_stix_id):
     except Exception:
         pass
 
-    # 3. CAMPAÑAS (¡Añadido!)
+    # Campañas
     try:
-        # La librería expone este método para las relaciones con campañas
         campaigns_using = mitre_data.get_campaigns_using_technique(technique_stix_id)
         for item in campaigns_using:
             desc = ''
@@ -105,7 +104,7 @@ def obtener_detecciones(mitre_data, technique_stix_id):
     texto_detecciones = []
     
     try:
-        # 1. Obtenemos las estrategias de detección asociadas a la técnica
+        # Obtenemos las estrategias de detección asociadas a la técnica
         strategies = mitre_data.get_detection_strategies_detecting_technique(technique_stix_id)
         
         for item in strategies:
@@ -115,34 +114,28 @@ def obtener_detecciones(mitre_data, technique_stix_id):
             # Inicializamos el bloque de texto para esta estrategia
             bloque_estrategia = f"Detection Strategy: {strategy_name}\n"
             
-            # 2. Extraemos la lista de IDs de las analíticas asociadas
+            # Extraemos la lista de IDs de las analíticas asociadas
             analytic_refs = getattr(strategy_obj, 'x_mitre_analytic_refs', [])
             
-            # 3. Iteramos por cada analítica para extraer su 'description'
+            # Iteramos por cada analítica para extraer su 'description'
             for ref in analytic_refs:
-                # Resolvemos el STIX ID para traer el objeto Analítica completo
                 analytic_obj = mitre_data.get_object_by_stix_id(ref)
                 
                 if analytic_obj:
                     analytic_name = getattr(analytic_obj, 'name', '')
                     analytic_desc = getattr(analytic_obj, 'description', '')
                     
-                    # Limpiamos la descripción con la función de Regex creada antes
+                    # Limpiamos la descripción
                     desc_limpia = limpiar_texto_mitre(analytic_desc)
                     
                     bloque_estrategia += f"- Analytic '{analytic_name}': {desc_limpia}\n"
                     
-                    # TIP DE CALIDAD PARA EL TFM:
-                    # Las analíticas a veces incluyen las reglas de detección exactas (Queries)
-                    # en campos como 'x_mitre_rules' o similares dependiendo de la plataforma.
-                    # Si existen, añadirlas al texto es oro puro para el BM25.
                     if hasattr(analytic_obj, 'x_mitre_rules'):
                         bloque_estrategia += f"  Detection Rules: {analytic_obj.x_mitre_rules}\n"
             
             texto_detecciones.append(bloque_estrategia)
             
     except Exception as e:
-        # En caso de que alguna técnica antigua no tenga este nuevo formato de mapeo
         pass
         
     return "\n".join(texto_detecciones)

@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 import pandas as pd
 import json
 from langchain_openai import ChatOpenAI
-import httpx
 
 
 load_dotenv()
@@ -21,16 +20,18 @@ API_KEY = os.getenv('GEMINI_TOKEN')
 
 
 def main():
+
+    # Definir la configuración
     config = AgentConfig(
         use_context_window=True,
         context_window_size=4,
-        context_mode='AROUND',
+        context_mode='PAST',
         generate_report=True,
         report_dir='reports',
         mitre_top_k=10
     )
 
-
+    # Definir los LLMs
     llm_strict = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.0, seed=42)
     llm_creative = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite', api_key=API_KEY, temperature=0.2, seed=42)
 
@@ -52,24 +53,34 @@ def main():
     # )
 
 
+    # Definir el modelo de embeddings
     embedder = SentenceTransformerEmbedder('BAAI/bge-small-en-v1.5')
+
+    # Definir los índices vectoriales
     mitre_store = ElasticSearchVectorStore(index_name='mitre_attack_v3_bge_small')
     cve_store = ElasticSearchVectorStore(index_name='kev_cve_index_bge')
-    
-    alert_data = CSVAlertRepository(csv_path='data/alerts_dataset_parsed.csv')
 
-    data_saver = CSVDataSaver(alerts_csv_path='evaluations/alerts_results.csv', evaluations_csv_path='evaluations/evaluations_results.csv')
+    # Definir el repositorio de alertas
+    alert_data = CSVAlertRepository(csv_path='data/alerts_dataset_parsed.csv')
+    
+    # Instanciar el TokenTracker
     tracker = UniversalTokenTracker()
+
+    # Instanciar el agente con los componentes definidos
     agent = SOCAgent(config, llm_strict, llm_creative, alert_data, embedder, mitre_store, cve_store, tracker)
     
-    evaluator = EvaluationRunner(agent, data_saver, config)
+    # Si se quiere ejecutar una evaluación:  
+    # Definir el guardado de los datos
+    # data_saver = CSVDataSaver(alerts_csv_path='evaluations/alerts_results.csv', evaluations_csv_path='evaluations/evaluations_results.csv')
+    
+    # # Definir el evaluador
+    # evaluator = EvaluationRunner(agent, data_saver, config)
 
-    # df = pd.read_csv('data/dataset_sintetico_cves.csv', parse_dates=['timestamp'])
-    df = pd.read_csv('data/unique.csv', parse_dates=['timestamp'])
-    alert = json.loads(df.iloc[-1]['alert'])
-
-
+    # df = pd.read_csv('data/unique_alerts.csv', parse_dates=['timestamp'])
+   
     # evaluator.run_evaluation(df, dataset_name='Unique Alerts', debug=True)
+
+    alert = json.loads(df.iloc[-1]['alert'])
     final_state, _ = agent.process_alert(alert)
 
     val_report = final_state.get('validation_report')
@@ -82,15 +93,6 @@ def main():
     report_text = final_state.get('final_report')
     print('Final Report:')
     print(report_text)
-
-    # if report_text:
-    #     alert_id = alert.get('id', 'unknown')
-    #     context = 'with_context' if config.use_context_window else 'without_context'
-    #     report_dir = f"reports/escenario5"
-    #     os.makedirs(report_dir, exist_ok=True)
-    #     with open(f"{report_dir}/{alert_id}_{context}.md", "w", encoding='utf-8') as f:
-    #         f.write(report_text)
-
 
 
 if __name__ == "__main__":

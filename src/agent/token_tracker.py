@@ -1,7 +1,6 @@
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.outputs import LLMResult
 from typing import Any
-import time
 
 class UniversalTokenTracker(BaseCallbackHandler):
     def __init__(self):
@@ -33,7 +32,8 @@ class UniversalTokenTracker(BaseCallbackHandler):
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
         """Suma los tokens automáticamente al nodo activo."""
         in_tok, out_tok = 0, 0
-        # 1. Intento estándar moderno (Funciona nativo con Gemini y nuevos de OpenAI)
+        
+        # Intento con estándar actual
         try:
             message = response.generations[0][0].message
             if hasattr(message, 'usage_metadata') and message.usage_metadata:
@@ -43,11 +43,12 @@ class UniversalTokenTracker(BaseCallbackHandler):
                 
                 self._save_node_stats(in_tok, out_tok, total_tok)
                 self.llm_calls += 1
-                return # Si lo encontramos aquí, terminamos
+                return 
+            
         except (AttributeError, IndexError):
             pass
 
-        # 2. Intento legacy / Ollama (Busca en response_metadata)
+        # Intento con estándar Ollama y OpenAI Legacy
         try:
             metadata = response.generations[0][0].message.response_metadata
             

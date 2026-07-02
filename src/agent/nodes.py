@@ -38,7 +38,14 @@ def make_classification_node(llm, tracker):
         
         tracker.record_node_time('classification', time.time() - start_time)
 
-        print(classification)
+        print('Classification Result:')
+        print(f'MITRE Search: {classification.mitre_search}')
+        print(f'MITRE Keywords: {classification.mitre_keywords}')
+        print(f'MITRE Description: {classification.mitre_description}\n')
+        print(f'CVE Search: {classification.cve_search}')
+        print(f'CVE Keywords: {classification.cve_keywords}')
+        print(f'CVE Description: {classification.cve_description}\n')
+
         return {'classification': classification}
     return classification_node
 
@@ -202,6 +209,7 @@ def make_validation_node(llm, tracker):
 
         for evaluation in validation_report.mitre_evaluations + validation_report.cve_evaluations:
             print(f"ID {evaluation.item_id} - Relevance Score: {evaluation.relevance_score}, Decision: {evaluation.decision}\nExplanation: {evaluation.explanation}\n")
+        
         return {'validation_report': validation_report}
     return validation_node
 
